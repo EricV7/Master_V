@@ -4,9 +4,7 @@
 
 ###返回对象的属性名组成的数组，使用for...in
 
-`var object = {"value": "hello", "id": "hello"}`
-
-`d3.keys(object); // ["value", "id"]`
+`var object = {"value": "hello", "id": "hello"} d3.keys(object); // ["value", "id"]`
 
 ##d3.values(object)
 
