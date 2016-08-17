@@ -15,9 +15,8 @@ d3.keys(object); // ["value", "id"]
 
 ```javascript
 var object = {"value": "hello", "id": "hello"}
+d3.values(object);
 ```
-d3.values(object);`
-
 ##d3.entries(object)
 
 ```javascript
@@ -35,13 +34,10 @@ d3.entries({foo: 42, bar: true}); // [{key: "foo", value: 42}, {key: "bar", valu
 
 ```javascript
 var object = {"value": "hello", "id": "hi"}
-```
 d3.map(object);
-
 d3.map([{name: "foo"}, {name: "bar"}]);
-
 d3.map([{name: "foo"}, {name: "bar"}], function(d) { return d.name; });`
-
+```
 ##map.has(key)
 
 ##map.get(key)
@@ -52,19 +48,13 @@ d3.map([{name: "foo"}, {name: "bar"}], function(d) { return d.name; });`
 
 ```javascript
 var hello = {"value": "hello"}
-```
 var map = d3.map();
-
 map.set(hello, hello);
-
 map.get(hello);
-
 map.get('[object Object]');
-
 map.set(hello, 1);
-
-map.get(hello);`
-
+map.get(hello);
+```
 ##map.remove(key)
 
 ###如果键值存在，则移除并且返回true，没有的话返回false
