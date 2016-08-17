@@ -13,14 +13,16 @@ d3.keys(object); // ["value", "id"]
 
 ###返回对象的属性值组成的数组
 
-`var object = {"value": "hello", "id": "hello"}
-
+```javascript
+var object = {"value": "hello", "id": "hello"}
+```
 d3.values(object);`
 
 ##d3.entries(object)
 
-`d3.entries({foo: 42, bar: true}); // [{key: "foo", value: 42}, {key: "bar", value: true}]`
-
+```javascript
+d3.entries({foo: 42, bar: true}); // [{key: "foo", value: 42}, {key: "bar", value: true}]`
+```
 #Maps
 
 ###特点
@@ -31,8 +33,9 @@ d3.values(object);`
 
 ###object可以是对象、数组和map，key是一个设置键的函数
 
-`var object = {"value": "hello", "id": "hi"}
-
+```javascript
+var object = {"value": "hello", "id": "hi"}
+```
 d3.map(object);
 
 d3.map([{name: "foo"}, {name: "bar"}]);
@@ -47,8 +50,9 @@ d3.map([{name: "foo"}, {name: "bar"}], function(d) { return d.name; });`
 
 >没有的话创建，有的话覆盖
 
-`var hello = {"value": "hello"}
-
+```javascript
+var hello = {"value": "hello"}
+```
 var map = d3.map();
 
 map.set(hello, hello);
@@ -73,23 +77,20 @@ map.get(hello);`
 
 ##map.entries()
 
-`var hello = {"value": "hello"}
-
+```javascript
+var hello = {"value": "hello"}
 var map = d3.map();
-
 map.set(hello, hello);
-
 map.set(1, 1);
-
 map.set('hi', 'hi');
-
 map.keys();
-
-map.entries();`
-
+map.entries();
+```
 ##map.each(function)
 
-`map.each(function(value, key, map) {console.log(value, key, map)});`
+```javascript
+map.each(function(value, key, map) {console.log(value, key, map)});
+```
 
 ##map.empty()
 
@@ -108,12 +109,11 @@ map.entries();`
 
 ##d3.set([array[, accessor]])
 
-`var hello = {"value": "hello"}
-
+```javascript
+var hello = {"value": "hello"}
 var array = [1, "hi", false, hello];
-
 var set = d3.set(array);`
-
+```
 ###set.has(value)
 
 ###set.add(value)
