@@ -92,7 +92,7 @@ map.each(function(value, key, map) {console.log(value, key, map)});
 
 #Sets
 
-##特点
+###特点
 
 >值会被强制转化为字符串
 >实现的时候其实使用的就是Map，是键和值相同的特殊Map
