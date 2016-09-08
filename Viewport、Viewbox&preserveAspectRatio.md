@@ -27,8 +27,7 @@ min-x 和 min-y 值决定viewBox的左上角，width和height决定视窗的宽�
     <!-- SVG content drawn onto the SVG canvas -->
 </svg>
 ```
-- [x] viewBox="0 0 400 300"到底有什么用呢？
-
+> viewBox="0 0 400 300"到底有什么用呢？
 它声明了一个特定的区域，canvas横跨左上角的点(0,0)到点(400,300)。
 SVG图像被这个区域裁切。
 区域被拉伸（类似缩放效果）来充满整个视窗。
