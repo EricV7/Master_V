@@ -43,7 +43,7 @@ min-x 和 min-y 值决定viewBox的左上角，width和height决定视窗的宽�
 整个viewBox适应视窗。
 保持viewBox的宽高比。viewBox没有被拉伸来覆盖视窗区域。
 viewBox在视窗中水平垂直居中。
-####这是默认表现。那用什么控制表现呢？如果我们想改变视窗中viewBox的位置呢？这就需要用到preserveAspectRatio属性了。
+> ####这是默认表现。那用什么控制表现呢？如果我们想改变视窗中viewBox的位置呢？这就需要用到preserveAspectRatio属性了。
 ---
 ###preserveAspectRatio
 #### preserveAspectRatio属性强制统一缩放比来保持图形的宽高比值。
