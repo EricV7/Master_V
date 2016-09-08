@@ -49,13 +49,17 @@ viewBox在视窗中水平垂直居中。
 #### preserveAspectRatio属性强制统一缩放比来保持图形的宽高比值。
 如果你用不同于视窗的宽高比定义用户坐标系，如果像我们在之前的例子中看到的那样浏览器拉伸viewBox来适应视窗，宽高比的不同会导致图形在某些方向上扭曲。
 > preserveAspectRatio = defer? <align> <meetOrSlice>?
-####1、defer声明是可选的，并且只有当你在<image>上添加preserveAspectRatio才被用到。用在任何其他元素上时它都会被忽略；
-####2、align参数声明是否强制统一放缩，如果是，对齐方法会在viewBox的宽高比不符合viewport的宽高比的情况下生效；
-如果align值设为none，图形不在保持宽高比而会缩放来适应视窗，像我们在上面两个例子中看到的那样。
-####3、meetOrSlice也是可选的，默认值为meet。这个属性声明整个viewBox在视窗中是否可见。如果是，它和align参数通过一个或多个空格分隔：
+#####1、defer声明是可选的，并且只有当你在<image>上添加preserveAspectRatio才被用到。用在任何其他元素上时它都会被忽略；
+#####2、align参数声明是否强制统一放缩，如果是，对齐方法会在viewBox的宽高比不符合viewport的宽高比的情况下生效；
+#####如果align值设为none，图形不在保持宽高比而会缩放来适应视窗，像我们在上面两个例子中看到的那样。
+#####3、meetOrSlice也是可选的，默认值为meet。这个属性声明整个viewBox在视窗中是否可见。如果是，它和align参数通过一个或多个空格分隔：
 > meet(默认值)，基于以下两条准则尽可能缩放元素：
   · 保持宽高比
   · 整个viewBox在视窗中可见
+> slice 在保持宽高比的情况下，缩放图形直到viewBox覆盖了整个视窗区域
+#####viewBox被缩放到正好覆盖视窗区域（在两个维度上），但是它不会缩放任何超出这个范围的部分。换而言之，它缩放到viewBox的宽高可以正好完全覆盖视窗。在这种情况下，如果viewBox的宽高比不适合视窗，一部分viewBox会扩展超过视窗边界（即，viewBox绘制的区域会比视窗大）。这会导致部分viewBox被切片(类似于在画图工具中，放大一个图片)
+#####所以，meetOrSlice被用来声明viewBox是否会被完全包含在视窗中，或者它是否应该尽可能缩放来覆盖整个视窗，甚至意味着部分的viewBox会被“slice”
 
+#####可以把meetOrSlice的值类比于background-size的contain和cover值;它们非常类似。meet类似于contain，slice类似于cover。
 
 ---
