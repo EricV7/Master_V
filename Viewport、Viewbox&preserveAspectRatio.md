@@ -66,9 +66,9 @@ min-x 和 min-y 值决定viewBox的左上角，width和height决定视窗的宽�
 ---
 align参数使用9个值中的一个或者为none。任何除none之外的值都用来保持宽高比缩放图片，并且还用来在视窗中对齐viewBox。
 > #####none : 如果有必要的话viewBox被拉伸或缩放来完全适应整个视窗，不管宽高比。图形也许会扭曲;
-  #####xMinYMin : 视窗X轴的最小值对齐元素viewBox的<min-x>。
-视窗Y轴的最小值对齐元素viewBox的<min-y>。
-把这个类比为backrgound-position: 0% 0%;。
+  xMinYMin : 视窗X轴的最小值对齐元素viewBox的<min-x>。
+             视窗Y轴的最小值对齐元素viewBox的<min-y>。
+             把这个类比为backrgound-position: 0% 0%;。
   
   
   
