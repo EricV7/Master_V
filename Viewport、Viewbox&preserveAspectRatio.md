@@ -40,10 +40,11 @@ min-x 和 min-y 值决定viewBox的左上角，width和height决定视窗的宽�
 </svg>
 ```
 因此图形在视窗中的定位默认为：
-整个viewBox适应视窗。
-保持viewBox的宽高比。viewBox没有被拉伸来覆盖视窗区域。
-viewBox在视窗中水平垂直居中。
+ · 整个viewBox适应视窗。
+ · 保持viewBox的宽高比。viewBox没有被拉伸来覆盖视窗区域。
+ · viewBox在视窗中水平垂直居中。
 这是默认表现。那用什么控制表现呢？如果我们想改变视窗中viewBox的位置呢？这就需要用到preserveAspectRatio属性了。
+
 ---
 ###preserveAspectRatio
 #### preserveAspectRatio属性强制统一缩放比来保持图形的宽高比值。
@@ -63,3 +64,12 @@ viewBox在视窗中水平垂直居中。
 #####可以把meetOrSlice的值类比于background-size的contain和cover值;它们非常类似。meet类似于contain，slice类似于cover。
 
 ---
+align参数使用9个值中的一个或者为none。任何除none之外的值都用来保持宽高比缩放图片，并且还用来在视窗中对齐viewBox。
+> #####none : 如果有必要的话viewBox被拉伸或缩放来完全适应整个视窗，不管宽高比。图形也许会扭曲;
+  #####xMinYMin : 视窗X轴的最小值对齐元素viewBox的<min-x>。
+视窗Y轴的最小值对齐元素viewBox的<min-y>。
+把这个类比为backrgound-position: 0% 0%;。
+  
+  
+  
+  
