@@ -41,16 +41,21 @@
 ##### 一般来说，样式的写操作之后，如果有下面这些属性的读操作，都会引发浏览器立即重新渲染。
 ##### 从性能角度考虑，尽量不要把读操作和写操作，放在一个语句里面。
 `// bad
-  div.style.left = div.offsetLeft + 10 + "px";
+
+div.style.left = div.offsetLeft + 10 + "px";
 div.style.top = div.offsetTop + 10 + "px";
 
 // good
+
 var left = div.offsetLeft;
-  var top  = div.offsetTop;
-  div.style.left = left + 10 + "px";
-  div.style.top = top + 10 + "px";`
+var top  = div.offsetTop;
+div.style.left = left + 10 + "px";
+div.style.top = top + 10 + "px";`
 
-
+一般的规则是：
+* 样式表越简单，重排和重绘就越快。
+* 重排和重绘的DOM元素层级越高，成本就越高。
+* table元素的重排和重绘成本，要高于div元素
 
 
 
