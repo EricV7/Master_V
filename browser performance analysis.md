@@ -98,13 +98,13 @@ Send Request     | 发送网络请求时触发
 ###### Scripting事件
 事件             | 描述    
 -------------    | -------------
-Animation Frame Fired       | 事件描述一个定义好的动画帧发生并在回调处理时触发
-Cancel Animation Frame   | 取消一个动画帧时触发
-GC Event   | 垃圾回收时触发
-DOMContentLoaded | 当页面中的DOM内容加载并解析完毕时触发   
-Event     | js事件(如mousedown等)
-Function Call     | 创建计时器（调用setTimeout()和setInterval()）时触发
-Remove Timer     | 当清除一个计时器时触发
+Animation Frame Fired       |   事件描述一个定义好的动画帧发生并在回调处理时触发
+Cancel Animation Frame      |   取消一个动画帧时触发
+GC Event                    |   垃圾回收时触发
+DOMContentLoaded     |     当页面中的DOM内容加载并解析完毕时触发   
+Event                |     js事件(如mousedown等)
+Function Call        |     创建计时器（调用setTimeout()和setInterval()）时触发
+Remove Timer         |  当清除一个计时器时触发
 Event     | js事件(如mousedown等)
 Event     | js事件(如mousedown等)
 Event     | js事件(如mousedown等)
@@ -112,13 +112,24 @@ XHR Ready State Change | 当一个异步请求为就绪状态后触发
 XHR Load  | 当一个异步请求完成加载后触发
 
 ###### Rendering事件
-事件描述Invalidate layout当DOM更改导致页面布局失效时触发Layout页面布局计算执行时触发Recalculate styleChrome重新计算元素样式时触发Scroll内嵌的视窗滚动时触发
+事件             | 描述    
+-------------    | -------------
+Invalidate layout   | 当DOM更改导致页面布局失效时触发
+Layout   | 页面布局计算执行时触发
+Recalculate styleChrome   | 重新计算元素样式时触发
+Scroll | 内嵌的视窗滚动时触发 
 
 ###### Painting事件
-事件描述Composite LayersChrome的渲染引擎完成图片层合并时触发Image Decode一个图片资源完成解码后触发Image Resize一个图片被修改尺寸后触发Paint合并后的层被绘制到对应显示区域后触发
+事件             | 描述    
+-------------    | -------------
+Composite Layers   | Chrome的渲染引擎完成图片层合并时触发
+Image Decode   | 一个图片资源完成解码后触发
+Image Resize   | 一个图片被修改尺寸后触发
+Paint | 合并后的层被绘制到对应显示区域后触发
 
 ##### 右键功能：
 * 保存、读取Timeline录制数据
+
 ***
 以下三种情况，会导致网页重新渲染。
 * 修改DOM
@@ -127,18 +138,21 @@ XHR Load  | 当一个异步请求完成加载后触发
   
 ##### 重新渲染，就需要重新生成布局和重新绘制。前者叫做"重排"（reflow），后者叫做"重绘"（repaint）。
 ##### 需要注意的是，"重绘"不一定需要"重排"，比如改变某个网页元素的颜色，就只会触发"重绘"，不会触发"重排"，因为布局没有改变。但是，"重排"必然导致"重绘"，比如改变一个网页元素的位置，就会同时触发"重排"和"重绘"，因为布局改变了。 
+
 ***
 ### 4、对于性能的影响
 
-##### 重排和重绘会不断触发，这是不可避免的。但是，它们非常耗费资源，是导致网页性能低下的根本原因。
-##### 提高网页性能，就是要降低"重排"和"重绘"的频率和成本，尽量少触发重新渲染。
+##### 重排和重绘会不断触发，这是不可避免的。但是，它们非常耗费资源，是导致网页性能低下的根本原因。提高网页性能，就是要降低"重排"和"重绘"的频率和成本，尽量少触发重新渲染。
 ##### 前面提到，DOM变动和样式变动，都会触发重新渲染。但是，浏览器已经很智能了，会尽量把所有的变动集中在一起，排成一个队列，然后一次性执行，尽量避免多次重新渲染。
 `div.style.color = 'blue';
-   div.style.marginTop = '30px';`
+
+div.style.marginTop = '30px';`
 ##### 上面代码中，div元素有两个样式变动，但是浏览器只会触发一次重排和重绘。下面代码，代码对div元素设置背景色以后，第二行要求浏览器给出该元素的位置，所以浏览器不得不立即重排。
 `div.style.color = 'blue';
-   var margin = parseInt(div.style.marginTop);
-  div.style.marginTop = (margin + 10) + 'px';`
+
+var margin = parseInt(div.style.marginTop);
+
+div.style.marginTop = (margin + 10) + 'px';`
 
 ##### 一般来说，样式的写操作之后，如果有下面这些属性的读操作，都会引发浏览器立即重新渲染。
 ##### 从性能角度考虑，尽量不要把读操作和写操作，放在一个语句里面。
