@@ -25,6 +25,7 @@
 
 ##### 一秒之间能够完成多少次重新渲染，这个指标就被称为"刷新率"，英文为FPS（frame per second）。60次重新渲染，就是60FPS。这意味着，一秒之内进行60次重新渲染，每次重新渲染的时间不能超过16.66毫秒。
 ##### 网页动画的每一帧（frame）都是一次重新渲染。每秒低于24帧的动画，人眼就能感受到停顿。一般的网页动画，需要达到每秒30帧到60帧的频率，才能比较流畅。如果能达到每秒70帧甚至80帧，就会极其流畅。
+
 > 如果想达到60帧的刷新率，就意味着JavaScript线程每个任务的耗时，必须少于16毫秒。一个解决办法是使用Web Worker，主线程只用于UI渲染，然后跟UI渲染不相干的任务，都放在Worker线程。
 ***
 ### 4、开发者工具的Timeline面板
@@ -33,7 +34,7 @@
 * 概况栏 - 页面性能概况
 * 火焰图 - CPU性能的形象展现
 * 三条虚线：蓝-解析DOM文本的事件；绿-开始绘制的时间；红-加载脚本等的事件
-[Pics](https://developers.google.com/web/tools/chrome-devtools/evaluate-performance/imgs/timeline-annotated.png)
+![Pics](https://developers.google.com/web/tools/chrome-devtools/evaluate-performance/imgs/timeline-annotated.png)
 ##### 基本使用方法：
 * 录制一段页面加载过程 或 用户操作过程的记录；
 * 观察概览窗口中的 FPS, CPU, and network 区域；
