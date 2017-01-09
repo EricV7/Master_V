@@ -28,7 +28,12 @@
 > 如果想达到60帧的刷新率，就意味着JavaScript线程每个任务的耗时，必须少于16毫秒。一个解决办法是使用Web Worker，主线程只用于UI渲染，然后跟UI渲染不相干的任务，都放在Worker线程。
 ***
 ### 4、开发者工具的Timeline面板
-##### Chrome浏览器开发者工具的Timeline面板，是查看"刷新率"的最佳工具
+##### Timeline面板概述
+* 控制栏 - 控制录制等相关信息
+* 概况栏 - 页面性能概况
+* 火焰图 - CPU性能的形象展现
+* 三条虚线：蓝-解析DOM文本的事件；绿-开始绘制的时间；红-加载脚本等的事件
+[Pics](https://developers.google.com/web/tools/chrome-devtools/evaluate-performance/imgs/timeline-annotated.png)
 ##### 基本使用方法：
 * 录制一段页面加载过程 或 用户操作过程的记录；
 * 观察概览窗口中的 FPS, CPU, and network 区域；
