@@ -83,20 +83,24 @@ When the recording is finished, DevTools guesses what portion of the recording i
 * Duration(at time-stamp)：该事件及其子事件执行完的时间
 * Self time：该事件（不包括其子事件）耗时
 * Used Heap Size：事件执行时所占用的内存
+
 ##### TimeLine中的事件汇总：
+
 ###### Loading事件
-| 事件        | 描述           |
-| ------------- |:-------------:|
-| Parse HTML      | 浏览器执行HTML解析 |
-| Finish Loading  | 网络请求完毕事件  |
-| Receive Data | 请求的响应数据到达事件，如果响应数据很大（拆包），可能会多次触发该事件  |
-| Receive Response  | 响应头报文到达时触发  |
-| Send Request | 发送网络请求时触发 |
+事件             | 描述                                         
+-------------    | -------------
+Parse HTML       | 浏览器执行HTML解析                                               
+Finish Loading   | 网络请求完毕事件                                                 
+Receive Data     | 请求的响应数据到达事件，如果响应数据很大（拆包），可能会多次触发该事件
+Receive Response | 响应头报文到达时触发                                             
+Send Request     | 发送网络请求时触发                                               
 
 ###### Scripting事件
 事件描述Animation Frame Fired一个定义好的动画帧发生并开始回调处理时触发Cancel Animation Frame取消一个动画帧时触发GC Event垃圾回收时触发DOMContentLoaded当页面中的DOM内容加载并解析完毕时触发Evaluate ScriptA script was evaluated.Eventjs事件Function Call只有当浏览器进入到js引擎中时触发Install Timer创建计时器（调用setTimeout()和setInterval()）时触发Request Animation FrameA requestAnimationFrame() call scheduled a new frameRemove Timer当清除一个计时器时触发Time调用console.time()触发Time End调用console.timeEnd()触发Timer Fired定时器激活回调后触发XHR Ready State Change当一个异步请求为就绪状态后触发XHR Load当一个异步请求完成加载后触发
+
 ###### Rendering事件
 事件描述Invalidate layout当DOM更改导致页面布局失效时触发Layout页面布局计算执行时触发Recalculate styleChrome重新计算元素样式时触发Scroll内嵌的视窗滚动时触发
+
 ###### Painting事件
 事件描述Composite LayersChrome的渲染引擎完成图片层合并时触发Image Decode一个图片资源完成解码后触发Image Resize一个图片被修改尺寸后触发Paint合并后的层被绘制到对应显示区域后触发
 
