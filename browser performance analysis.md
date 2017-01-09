@@ -20,21 +20,15 @@
 ##### 渲染树布局
 ##### ↓ 将布局绘制（paint）在屏幕上
 ##### 绘制渲染树
-***
-### 3、刷新率
-
-##### 一秒之间能够完成多少次重新渲染，这个指标就被称为"刷新率"，英文为FPS（frame per second）。60次重新渲染，就是60FPS。这意味着，一秒之内进行60次重新渲染，每次重新渲染的时间不能超过16.66毫秒。
-##### 网页动画的每一帧（frame）都是一次重新渲染。每秒低于24帧的动画，人眼就能感受到停顿。一般的网页动画，需要达到每秒30帧到60帧的频率，才能比较流畅。如果能达到每秒70帧甚至80帧，就会极其流畅。
-
-> 如果想达到60帧的刷新率，就意味着JavaScript线程每个任务的耗时，必须少于16毫秒。一个解决办法是使用Web Worker，主线程只用于UI渲染，然后跟UI渲染不相干的任务，都放在Worker线程。
 
 ***
+
 ### 4、开发者工具的Timeline面板
 ##### Timeline面板概述
 * 控制栏 - 控制录制等相关信息
 * 概况栏 - 页面性能概况
 * 火焰图 - CPU性能的形象展现（三条虚线：蓝-解析DOM文本的事件；绿-开始绘制的时间；红-加载脚本等的事件）
-* 损耗性能详情部分（后面详细介绍）
+* 损耗性能详情部分（后面详细介绍）{#index}
 ![Pics](https://developers.google.com/web/tools/chrome-devtools/evaluate-performance/imgs/timeline-annotated.png)
 
 ##### 工具栏：
@@ -156,6 +150,7 @@ div.style.marginTop = (margin + 10) + 'px';`
 `// bad
 div.style.left = div.offsetLeft + 10 + "px";
 div.style.top = div.offsetTop + 10 + "px";`
+
 `// good
 var left = div.offsetLeft;
 var top  = div.offsetTop;
@@ -167,7 +162,54 @@ div.style.top = top + 10 + "px";`
 * 重排和重绘的DOM元素层级越高，成本就越高。
 * table元素的重排和重绘成本，要高于div元素
 
-### 5、对于性能的影响
+### 3、刷新率
+跳转到[FPS](#index)
+##### 一秒之间能够完成多少次重新渲染，这个指标就被称为"刷新率"，英文为FPS（frame per second）。60次重新渲染，就是60FPS。这意味着，一秒之内进行60次重新渲染，每次重新渲染的时间不能超过16.66毫秒。
+##### 网页动画的每一帧（frame）都是一次重新渲染。每秒低于24帧的动画，人眼就能感受到停顿。一般的网页动画，需要达到每秒30帧到60帧的频率，才能比较流畅。如果能达到每秒70帧甚至80帧，就会极其流畅。
+
+> 如果想达到60帧的刷新率，就意味着JavaScript线程每个任务的耗时，必须少于16毫秒。一个解决办法是使用Web Worker，主线程只用于UI渲染，然后跟UI渲染不相干的任务，都放在Worker线程。
+
+***
+
+### 5、像素渲染流水线
+![Pics](https://developers.google.com/web/fundamentals/performance/rendering/images/intro/frame-full.jpg)
+- JavaScript。一般来说，我们会使用JavaScript来实现一些视觉变化的效果。比如用jQuery的animate函数做一个动画、对一个数据集进行排序、或者往页面里添加一些DOM元素等。当然，除了JavaScript，还有其他一些常用方法也可以实现视觉变化效果，比如：CSS Animations, Transitions和Web Animation API。
+- 计算样式。这个过程是根据CSS选择器，比如.headline或.nav > .nav_item，对每个DOM元素匹配对应的CSS样式。这一步结束之后，就确定了每个DOM元素上该应用什么CSS样式规则。
+ 布局。上一步确定了每个DOM元素的样式规则，这一步就是具体计算每个DOM元素最终在屏幕上显示的大小和位置。web页面中元素的布局是相对的，因此一个元素的布局发生变化，会联动地引发其他元素的布局发生变化。比如，<body>元素的宽度的变化会影响其子元素的宽度，其子元素宽度的变化也会继续对其孙子元素产生影响。因此对于浏览器来说，布局过程是经常发生的。
+- 绘制。绘制，本质上就是填充像素的过程。包括绘制文字、颜色、图像、边框和阴影等，也就是一个DOM元素所有的可视效果。一般来说，这个绘制过程是在多个层上完成的。
+- 渲染层合并。由上一步可知，对页面中DOM元素的绘制是在多个层上进行的。在每个层上完成绘制过程之后，浏览器会将所有层按照合理的顺序合并成一个图层，然后显示在屏幕上。对于有位置重叠的元素的页面，这个过程尤其重要，因为一旦图层的合并顺序出错，将会导致元素显示异常。
+
+* Note: 你可能听说过 "rasterize" 这个术语，它通常被用在绘制过程中。绘制过程本身包含两步: ：1）创建一系列draw调用；2）填充像素。 第二步的过程被称作 "rasterization" 。因此当你在DevTools中查看页面的paint记录时，你可以认为它已经包含了 rasterization。（有些浏览器会使用不同的线程来完成这两步，不过这也不是web开发者能控制的了）
+
+#### 虽然在理论上，页面的每一帧都是经过上述的流水线处理之后渲染出来的，但并不意味着页面每一帧的渲染都需要经过上述五个步骤的处理。实际上，对视觉变化效果的一个帧的渲染，有这么三种 常用的 流水线：
+
+1. 1. JS / CSS > 计算样式 > 布局 > 绘制 > 渲染层合并
+![Pics](https://developers.google.com/web/fundamentals/performance/rendering/images/intro/frame-full.jpg)
+* 如果你修改一个DOM元素的”layout”属性，也就是改变了元素的样式（比如宽度、高度或者位置等），那么浏览器会检查哪些元素需要重新布局，然后对页面激发一个reflow过程完成重新布局。被reflow的元素，接下来也会激发绘制过程，最后激发渲染层合并过程，生成最后的画面。
+
+2. 2. JS / CSS > 计算样式 > 绘制 > 渲染层合并
+![Pics](https://developers.google.com/web/fundamentals/performance/rendering/images/intro/frame-no-layout.jpg)
+* 如果你修改一个DOM元素的“paint only”属性，比如背景图片、文字颜色或阴影等，这些属性不会影响页面的布局，因此浏览器会在完成样式计算之后，跳过布局过程，只做绘制和渲染层合并过程。
+
+3. 3. JS / CSS > 计算样式 > 渲染层合并
+![Pics](https://developers.google.com/web/fundamentals/performance/rendering/images/intro/frame-no-layout-paint.jpg)
+* 如果你修改一个DOM元素的“paint only”属性，比如背景图片、文字颜色或阴影等，这些属性不会影响页面的布局，因此浏览器会在完成样式计算之后，跳过布局过程，只做绘制和渲染层合并过程。
+
+### 优化JavaScript的执行效率
+#### 页面里的动画效果大多是通过JavaScript触发的。有些是直接修改DOM元素样式属性而产生的，有些则是由数据计算而产生的，比如搜索或排序。错误的执行时机和太长的时间消耗，是常见的导致JavaScript性能低下的原因。你需要尽量减少这两方面对你的JavaScript代码带来的执行性能的影响。
+
+* 对于动画效果的实现，避免使用setTimeout或setInterval，请使用requestAnimationFrame。
+* 把耗时长的JavaScript代码放到Web Workers中去做。
+* 把DOM元素的更新划分为多个小任务，分别在多个frame中去完成。
+* 使用Chrome DevTools的Timeline和JavaScript Profiler来分析JavaScript的性能。
+* 很多框架和示例代码都是用setTimeout或setInterval来实现页面中的动画效果。这种实现方式的问题是，你在setTimeout或setInterval中指定的回调函数的执行时机是无法保证的。它将在这一帧动画的_某个时间点_被执行，很可能是在帧结束的时候。这就意味这我们可能失去这一帧的信息，也就是发生jank。
+![Pics](https://developers.google.com/web/fundamentals/performance/rendering/images/optimize-javascript-execution/settimeout.jpg)
+
+
+
+
+
+
 
 
 
