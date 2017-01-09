@@ -169,7 +169,7 @@ div.style.top = top + 10 + "px";`
 
 > 如果想达到60帧的刷新率，就意味着JavaScript线程每个任务的耗时，必须少于16毫秒。一个解决办法是使用Web Worker，主线程只用于UI渲染，然后跟UI渲染不相干的任务，都放在Worker线程。
 
-***
+*** 
 
 ### 5、像素渲染流水线
 ![Pics](https://developers.google.com/web/fundamentals/performance/rendering/images/intro/frame-full.jpg)
