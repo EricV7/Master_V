@@ -27,20 +27,15 @@
 ##### 网页动画的每一帧（frame）都是一次重新渲染。每秒低于24帧的动画，人眼就能感受到停顿。一般的网页动画，需要达到每秒30帧到60帧的频率，才能比较流畅。如果能达到每秒70帧甚至80帧，就会极其流畅。
 
 > 如果想达到60帧的刷新率，就意味着JavaScript线程每个任务的耗时，必须少于16毫秒。一个解决办法是使用Web Worker，主线程只用于UI渲染，然后跟UI渲染不相干的任务，都放在Worker线程。
-***
 
+***
 ### 4、开发者工具的Timeline面板
 ##### Timeline面板概述
 * 控制栏 - 控制录制等相关信息
 * 概况栏 - 页面性能概况
-* 火焰图 - CPU性能的形象展现
-* 三条虚线：蓝-解析DOM文本的事件；绿-开始绘制的时间；红-加载脚本等的事件
+* 火焰图 - CPU性能的形象展现（三条虚线：蓝-解析DOM文本的事件；绿-开始绘制的时间；红-加载脚本等的事件）
+* 损耗性能详情部分（后面详细介绍）
 ![Pics](https://developers.google.com/web/tools/chrome-devtools/evaluate-performance/imgs/timeline-annotated.png)
-##### 基本使用方法：
-* 录制一段页面加载过程 或 用户操作过程的记录；
-* 观察概览窗口中的 FPS, CPU, and network 区域；
-* 点击chart图中的事件以查看其相关细节；
-* 将时间窗口聚焦某一部分，能更好地进行分析。
 
 ##### 工具栏：
 * JS Profile：开启时，绘制图表展现录制过程中每个被调用的函数消耗资源情况
@@ -48,16 +43,26 @@
 * Memory：样式计算和布局，即重排
 
 ##### 概览窗口：
-1. FPS.（每秒帧数） The higher the green bar, the higher the FPS. The red blocks above the FPS graph indicate long frames, which are likely candidates for jank.
+1. FPS.（每秒帧数） 绿色bar越高，FPS越高。FPS图表上的红色色块代表长帧动画，可以理解为可供优化的地方；
 2. CPU.（CPU资源） 不同类别的事件消耗CPU资源的情况；
 3. NET.（网络请求）资源的请求及加载时间；
-* 其中，蓝色表示HTML文件，黄色为Scripts文件，紫色为Stylesheets文件，绿色为Media文件，灰色为其他混杂资源（可以理解为浏览器内部c++的一些工作，和前端js以及渲染关系不大）
+* 其中，蓝色表示HTML文件；黄色为Scripts文件；紫色为Stylesheets文件；绿色为Media文件；灰色为其他混杂资源（可以理解为浏览器内部c++的一些工作，和前端js以及渲染关系不大，也有说是没有被DevTools感知到的活动）；空白区块：显示刷新周期（display refresh cycles）中的空闲时间段
+![Pics](https://developers.google.com/web/tools/chrome-devtools/evaluate-performance/imgs/overview-annotated.jpg)
 
 ##### 4种颜色表示不同类别事件：
 * 蓝色：网络通信和HTML解析
 * 黄色：JavaScript执行
 * 紫色：样式计算和布局，即重排
 * 绿色：重绘
+
+##### 基本使用方法：
+* 录制一段页面加载过程 或 用户操作过程的记录；
+* 观察概览窗口中的 FPS, CPU, and network 区域；
+* 点击chart图中的事件以查看其相关细节；
+* 将时间窗口聚焦某一部分，能更好地进行分析。
+To make a recording of a page load, open the Timeline panel, open the page that you want to record, and then reload the page. The Timeline panel automatically records the page reload.
+To make a recording of a page interaction, open the Timeline panel, then start the recording by pressing the Record button (record button) or by typing the keyboard shortcut Cmd+E (Mac) or Ctrl+E (Windows / Linux). The Record button turns red during a recording. Perform your page interactions, and then press the Record button or type the keyboard shortcut again to stop the recording.
+When the recording is finished, DevTools guesses what portion of the recording is most relevant to you, and automatically zooms to that portion.
 
 ##### 录制tips：
 * 录制时长尽可能短，降低分析难度
@@ -66,6 +71,34 @@
 * 关闭其他扩展程序，会对录制脚本的分析有干扰
 * 截屏功能可记录关键时刻，鼠标从左移向右，可作为模拟动画的幻灯片
 * 录制工具比较智能，结束时，会猜测和页面操作最相关的部分，并切换到该区域。
+
+##### 查看录制详情：
+* 当选中火焰图中的某事件时，详情界面会展示该事件相关的额外信息；
+![Pics](https://developers.google.com/web/tools/chrome-devtools/evaluate-performance/imgs/details-pane.png)
+* Summary：所有事件类型
+* Aggregated time：当事件是嵌套事件时，各类型事件的时耗
+* Call Stack：含有子事件的事件 的各类型时耗
+* CPU time：事件占用CPU的时耗
+* Details：该事件的其他细节
+* Duration(at time-stamp)：该事件及其子事件执行完的时间
+* Self time：该事件（不包括其子事件）耗时
+* Used Heap Size：事件执行时所占用的内存
+##### TimeLine中的事件汇总：
+###### Loading事件
+| 事件        | 描述           |
+| ------------- |:-------------:|
+| Parse HTML      | 浏览器执行HTML解析 |
+| Finish Loading  | 网络请求完毕事件  |
+| Receive Data | 请求的响应数据到达事件，如果响应数据很大（拆包），可能会多次触发该事件  |
+| Receive Response  | 响应头报文到达时触发  |
+| Send Request | 发送网络请求时触发 |
+
+###### Scripting事件
+事件描述Animation Frame Fired一个定义好的动画帧发生并开始回调处理时触发Cancel Animation Frame取消一个动画帧时触发GC Event垃圾回收时触发DOMContentLoaded当页面中的DOM内容加载并解析完毕时触发Evaluate ScriptA script was evaluated.Eventjs事件Function Call只有当浏览器进入到js引擎中时触发Install Timer创建计时器（调用setTimeout()和setInterval()）时触发Request Animation FrameA requestAnimationFrame() call scheduled a new frameRemove Timer当清除一个计时器时触发Time调用console.time()触发Time End调用console.timeEnd()触发Timer Fired定时器激活回调后触发XHR Ready State Change当一个异步请求为就绪状态后触发XHR Load当一个异步请求完成加载后触发
+###### Rendering事件
+事件描述Invalidate layout当DOM更改导致页面布局失效时触发Layout页面布局计算执行时触发Recalculate styleChrome重新计算元素样式时触发Scroll内嵌的视窗滚动时触发
+###### Painting事件
+事件描述Composite LayersChrome的渲染引擎完成图片层合并时触发Image Decode一个图片资源完成解码后触发Image Resize一个图片被修改尺寸后触发Paint合并后的层被绘制到对应显示区域后触发
 
 ##### 右键功能：
 * 保存、读取Timeline录制数据
