@@ -87,16 +87,29 @@ When the recording is finished, DevTools guesses what portion of the recording i
 ##### TimeLine中的事件汇总：
 
 ###### Loading事件
-事件             | 描述                                         
+事件             | 描述    
 -------------    | -------------
-Parse HTML       | 浏览器执行HTML解析                                               
-Finish Loading   | 网络请求完毕事件                                                 
+Parse HTML       | 浏览器执行HTML解析 
+Finish Loading   | 网络请求完毕事件
 Receive Data     | 请求的响应数据到达事件，如果响应数据很大（拆包），可能会多次触发该事件
-Receive Response | 响应头报文到达时触发                                             
-Send Request     | 发送网络请求时触发                                               
+Receive Response | 响应头报文到达时触发    
+Send Request     | 发送网络请求时触发       
 
 ###### Scripting事件
-事件描述Animation Frame Fired一个定义好的动画帧发生并开始回调处理时触发Cancel Animation Frame取消一个动画帧时触发GC Event垃圾回收时触发DOMContentLoaded当页面中的DOM内容加载并解析完毕时触发Evaluate ScriptA script was evaluated.Eventjs事件Function Call只有当浏览器进入到js引擎中时触发Install Timer创建计时器（调用setTimeout()和setInterval()）时触发Request Animation FrameA requestAnimationFrame() call scheduled a new frameRemove Timer当清除一个计时器时触发Time调用console.time()触发Time End调用console.timeEnd()触发Timer Fired定时器激活回调后触发XHR Ready State Change当一个异步请求为就绪状态后触发XHR Load当一个异步请求完成加载后触发
+事件             | 描述    
+-------------    | -------------
+Animation Frame Fired       | 事件描述一个定义好的动画帧发生并在回调处理时触发
+Cancel Animation Frame   | 取消一个动画帧时触发
+GC Event   | 垃圾回收时触发
+DOMContentLoaded | 当页面中的DOM内容加载并解析完毕时触发   
+Event     | js事件(如mousedown等)
+Function Call     | 创建计时器（调用setTimeout()和setInterval()）时触发
+Remove Timer     | 当清除一个计时器时触发
+Event     | js事件(如mousedown等)
+Event     | js事件(如mousedown等)
+Event     | js事件(如mousedown等)
+XHR Ready State Change | 当一个异步请求为就绪状态后触发
+XHR Load  | 当一个异步请求完成加载后触发
 
 ###### Rendering事件
 事件描述Invalidate layout当DOM更改导致页面布局失效时触发Layout页面布局计算执行时触发Recalculate styleChrome重新计算元素样式时触发Scroll内嵌的视窗滚动时触发
