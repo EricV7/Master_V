@@ -1,3 +1,4 @@
+# 主要讲解内容：浏览器的任务队列、页面的性能分析与优化，timeline工具的使用与诊断
 ## 一、浏览器加载、渲染及性能分析：
 ### 1、建立连接过程
 
@@ -54,9 +55,6 @@
 * 观察概览窗口中的 FPS, CPU, and network 区域；
 * 点击chart图中的事件以查看其相关细节；
 * 将时间窗口聚焦某一部分，能更好地进行分析。
-To make a recording of a page load, open the Timeline panel, open the page that you want to record, and then reload the page. The Timeline panel automatically records the page reload.
-To make a recording of a page interaction, open the Timeline panel, then start the recording by pressing the Record button (record button) or by typing the keyboard shortcut Cmd+E (Mac) or Ctrl+E (Windows / Linux). The Record button turns red during a recording. Perform your page interactions, and then press the Record button or type the keyboard shortcut again to stop the recording.
-When the recording is finished, DevTools guesses what portion of the recording is most relevant to you, and automatically zooms to that portion.
 
 ##### 录制tips：
 * 录制时长尽可能短，降低分析难度
@@ -131,6 +129,7 @@ Dimensions   | 绘制事件对象的大小
 * 修改样式表
 * 用户事件（比如鼠标悬停、页面滚动、输入框键入文字、改变窗口大小等等）
 ##### DOM的性能问题
+
 * 核心问题：当解析的html文件很大时，生成DOM树占用内存较大，同时遍历（不更新）元素耗时也更长。但这都不是重点，DOM的核心问题是：DOM修改导致的页面重绘、重新排版！重新排版是用户阻塞的操作，同时，如果频繁重排，CPU使用率也会猛涨！
 * 重新渲染，就需要重新生成布局和重新绘制。前者叫做"重排"（reflow），后者叫做"重绘"（repaint）。
 > DOM操作会导致一系列的重绘（repaint）、重新排版（reflow）操作。为了确保执行结果的准确性，所有的修改操作是按顺序同步执行的。大部分浏览器都不会在
@@ -139,6 +138,7 @@ Dimensions   | 绘制事件对象的大小
 > 一般的浏览器中（不含IE），repaint的速度远快于reflow，所以避免reflow更重要。
 * 需要注意的是，"重绘"不一定需要"重排"，比如改变某个网页元素的颜色，就只会触发"重绘"，不会触发"重排"，因为布局没有改变。但是，"重排"必然导致"重绘"，比如改变一个网页元素的位置，就会同时触发"重排"和"重绘"，因为布局改变了。
 ###### 解决问题的关键是：减少因DOM操作，引起的reflow。
+
 1. 1. 在DOM外，执行尽量多的变更操作。Demo：
 ```
 // 不好的做法
