@@ -27,7 +27,7 @@
 ##### Timeline面板概述
 * 控制栏 - 控制录制等相关信息
 * 概况栏 - 页面性能概况
-* 火焰图 - CPU性能的形象展现（三条虚线：蓝-解析DOM文本的事件；绿-开始绘制的时间；红-加载脚本等的事件）
+* 火焰图 - CPU性能的形象展现（三条虚线：蓝-解析DOM文本的事件；绿-最初开始绘制的时间；红-加载脚本等的事件）
 * 损耗性能详情部分（后面详细介绍）{#index}
 ![Pics](https://developers.google.com/web/tools/chrome-devtools/evaluate-performance/imgs/timeline-annotated.png)
 
