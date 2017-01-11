@@ -57,7 +57,7 @@
 * 其中，蓝色表示HTML文件；黄色为Scripts文件；紫色为Stylesheets文件；绿色为Media文件；灰色为其他混杂资源（可以理解为浏览器内部c++的一些工作，和前端js以及渲染关系不大，也有说是没有被DevTools感知到的活动）；空白区块：显示刷新周期（display refresh cycles）中的空闲时间段
 ![Pics](https://developers.google.com/web/tools/chrome-devtools/evaluate-performance/imgs/overview-annotated.jpg)
 
-##### 4种颜色表示不同类别事件：
+##### 5种颜色表示不同类别事件：
 * 蓝色：网络通信和HTML解析
 * 黄色：JavaScript执行
 * 紫色：样式计算和布局，即重排
