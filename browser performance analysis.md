@@ -1,4 +1,4 @@
-## 一、浏览器加载、渲染：
+## 一、浏览器加载、渲染及性能分析：
 ### 1、建立连接过程
 
 #### (1) 浏览器查找域名的IP地址
@@ -500,3 +500,30 @@ window.addEventListener('scroll', onScroll);`
 
 ### 13、Save and load recordings
 * 可供保存和读取Timeline数据
+***
+
+## 二、Web性能测试工具：
+#### 基于网页分析工具：
+* 1. 阿里测
+* 2. 百度应用性能检测中心
+* 3. Web PageTest
+
+#### 基于浏览器分析工具：
+* 1. Chrome自带工具F12
+* 2. Firebug（是firefox中最为经典的开发工具插件）
+* 3. Page Speed（google）
+
+#### 评分等级指标：
+* 1. 确保少量的HTTP请求（合并JS，CSS图片等）
+* 2. 使用内容分发CDN
+* 3. 设置过期的HTTP Header.设置Expires Header可以将脚本, 样式表, 图片, Flash等缓存在浏览器的Cache中。
+* 4. 使用gzip压缩
+* 5. 将CSS放置html头部
+* 6. 将JavaScript放置底部
+* 7. Avoid CSS expressions
+* 8. 使用外部引用JavaScript与CSS
+* 9. 减少DNS解析
+* 10. 压缩JavaScript和CSS
+* 11. 避免URL重定向。URL redirects are made using HTTP status codes 301 and 302. They tell the browser to go to another location.
+* 12. 删除重复JavaScript和CSS
+* 13. 设置ETags
