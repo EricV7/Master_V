@@ -147,18 +147,22 @@ Dimensions   | 绘制事件对象的大小
 div.style.marginTop = '30px';`
 ##### 上面代码中，div元素有两个样式变动，但是浏览器只会触发一次重排和重绘。下面代码，代码对div元素设置背景色以后，第二行要求浏览器给出该元素的位置，所以浏览器不得不立即重排。
 `div.style.color = 'blue';
+
 var margin = parseInt(div.style.marginTop);
+
 div.style.marginTop = (margin + 10) + 'px';`
 
 ##### 一般来说，样式的写操作之后，如果有下面这些属性的读操作，都会引发浏览器立即重新渲染。
 ##### 从性能角度考虑，尽量不要把读操作和写操作，放在一个语句里面。
 `// bad
 div.style.left = div.offsetLeft + 10 + "px";
+
 div.style.top = div.offsetTop + 10 + "px";`
 
 `// good
 var left = div.offsetLeft;
 var top  = div.offsetTop;
+
 div.style.left = left + 10 + "px";
 div.style.top = top + 10 + "px";`
 
@@ -286,33 +290,196 @@ dataSortWorker.addEventListener('message', function(evt) {
 ![Pics](https://developers.google.com/web/fundamentals/performance/rendering/images/reduce-the-scope-and-complexity-of-style-calculations/style-details.jpg)
 * 在细节信息中，我们可以看到一个耗时很长的样式计算事件，该事件的执行耗时超过了18毫秒。不巧的是，它正好是在页面滚动过程中发生的，因此给用户带来了一个很明显的卡顿效果。
 * 再点击一下JavaScript事件，你就会看到一个JavaScript事件调用栈。在这个栈中你能准确找到是哪个JavaScript事件触发了样式改动。另外，你还能看到这个样式改动影响到的元素个数（在本示例中这个数字超过400）、样式计算耗时多久。这些信息有助于你寻找改进代码的方法。
-
+***
 
 #### 3. 3. 避免大规模、复杂的布局，具体可以做什么？
+* 布局，就是浏览器计算DOM元素的几何信息的过程：元素大小和在页面中的位置。每个元素都有一个显式或隐式的大小信息，决定于其CSS属性的设置、或是元素本身内容的大小、抑或是其父元素的大小。在Blink/WebKit内核的浏览器和IE中，这个过程称为布局。在基于Gecko的浏览器（比如Firefox）中，这个过程称为Reflow。虽然称呼不一样，但二者在本质上是一样的。
+1. - 布局通常是在整个文档范围内发生
+2. - 需要布局的DOM元素的数量直接影响到性能；应该尽可能避免触发布局
+3. - 分析页面布局模型的性能；新的Flexbox比旧的Flexbox和基于浮动的布局模型更高效
+4. - 避免强制同步布局事件的发生；对于元素的样式属性值，要先读再写
+* 与样式计算类似，布局的时间消耗主要在于
+1. 1. 需要布局的DOM元素的数量
+2. 2. 布局过程的复杂程度
+
+##### 尽可能避免触发布局
+* 当你修改了元素的样式属性之后，浏览器会将会检查为了使这个修改生效是否需要重新计算布局以及更新渲染树。对于DOM元素的“几何属性”的修改，比如width/height/left/top等，都需要重新计算布局。
+
+![Pics](https://developers.google.com/web/fundamentals/performance/rendering/images/avoid-large-complex-layouts-and-layout-thrashing/big-layout.jpg)
+* 我们再仔细分析一下上面的例子，会发现布局耗费的时间超过20毫秒。前面已经说过，为了保障流畅的动画效果，我们需要控制每一帧的时间消耗在16毫秒以内，而现在这个消耗显然太长了。我们还可以看到其他一些细节，比如布局树的大小（此例中为1618个节点）、需要布局的DOM节点数量。
+
+##### 使用flexbox替代老的布局模型
+* 下图显示了对页面中1300个盒对象使用浮动布局的时间消耗分析。当然这个例子有点极端，因为它只用了一种定位方式，而在大多数实际应用中会混用多种定位方式。
+![Pics](https://developers.google.com/web/fundamentals/performance/rendering/images/avoid-large-complex-layouts-and-layout-thrashing/layout-float.jpg)
+* 下图是使用Flexbox布局方式的时间消耗图：
+![Pics](https://developers.google.com/web/fundamentals/performance/rendering/images/avoid-large-complex-layouts-and-layout-thrashing/layout-flex.jpg)
+* 在任何情况下，不管是是否使用Flexbox，你都应该努力避免同时触发所有布局，特别在页面对性能敏感的时候（比如执行动画效果或页面滚动时）
+
+##### 避免强制同步布局事件的发生
+* 将一帧画面渲染到屏幕上的处理顺序如下所示：
+![Pics](https://developers.google.com/web/fundamentals/performance/rendering/images/avoid-large-complex-layouts-and-layout-thrashing/frame.jpg)
+* 首先是执行JavaScript脚本，_然后_是样式计算，_然后_是布局。但是，我们还可以强制浏览器在执行JavaScript脚本之前先执行布局过程，这就是所谓的强制同步布局。
+* 首先你得记住，在JavaScript脚本运行的时候，它能获取到的元素样式属性值都是上一帧画面的，都是旧的值。因此，如果你想在这一帧开始的时候，读取一个元素（暂且称其为“box”）的height属性，你可以会写出这样的JavaScript代码：
+`requestAnimationFrame(logBoxHeight);
+
+function logBoxHeight() {
+  // 获取像素对象的高度
+  console.log(box.offsetHeight);
+}`
+* 如果你在读取height属性之前，修改了box的样式，那么可能就会有问题了：
+`function logBoxHeight() {
+
+  box.classList.add('super-big');
+
+  // Gets the height of the box in pixels
+  // and logs it out.
+  console.log(box.offsetHeight);
+}`
+* 现在，为了给你返回box的height属性值，浏览器必须_首先_应用box的属性修改（因为对其添加了super-big样式），_接着_执行布局过程。在这之后，浏览器才能返回正确的height属性值。但其实我们可以避免这个不必要且耗费昂贵的布局过程。
+为了避免触发不必要的布局过程，你应该首先批量读取元素样式属性（浏览器将直接返回上一帧的样式属性值），然后再对样式属性进行写操作。
+
+##### 避免快速连续的布局
+* 还有一种情况比强制同步布局更糟：连续快速的多次执行它。我们看看这段代码：
+`function resizeAllParagraphsToMatchBlockWidth() {
+
+  // Puts the browser into a read-write-read-write cycle.
+  for (var i = 0; i < paragraphs.length; i++) {
+    paragraphs[i].style.width = box.offsetWidth + 'px';
+  }
+}`
+* 这段代码对一组段落标签执行循环操作，设置<p>标签的width属性值，使其与box元素的宽度相同。看上去这段代码是OK的，但问题在于，在每次循环中，都读取了box元素的一个样式属性值，然后立即使用该值来更新<p>元素的width属性。在下一次循环中读取box元素offsetwidth属性的时候，浏览器必须先使得上一次循环中的样式更新操作生效，也就是执行布局过程，然后才能响应本次循环中的样式读取操作。也就意味着，布局过程将在_每次循环_中发生。
+
+* 我们使用_先读后写_的原则，来修复上述代码中的问题：
+`// Read.
+var width = box.offsetWidth;
+
+function resizeAllParagraphsToMatchBlockWidth() {
+  for (var i = 0; i < paragraphs.length; i++) {
+    // Now write.
+    paragraphs[i].style.width = width + 'px';
+  }
+}`
+***
+
+#### 4. 4. 简化绘制的复杂度、减小绘制区域，具体可以做什么？
+* 绘制，是填充像素的过程，这些像素将最终显示在用户的屏幕上。通常，这个过程是整个渲染流水线中耗时最长的一环，因此也是最需要避免发生的一环。
+1. - 除了transform和opacity之外，修改任何属性都会触发绘制
+2. - 一般情况下，绘制是整个渲染流水线中代价最高的环节，要尽可能避免它
+3. - 通过渲染层提升和仔细规划动画渲染来减小绘制区域
+4. - 使用Chrome DevTools的来分析绘制复杂度和时间消耗；尽可能降低这些指标
+
+##### 使用Chrome DevTools来迅速定位绘制过程中的性能瓶颈
+* 使用Chrome DevTools能够迅速定位出当前页面中正在进行绘制的区域。打开DevTools，按下键盘的ESC键。在弹出的面板中，选中rendering选项卡，然后选中“Show paint rectangles”：
+![Pics](https://developers.google.com/web/fundamentals/performance/rendering/images/simplify-paint-complexity-and-reduce-paint-areas/show-paint-rectangles.jpg)
+* 打开了Chrome的这个选项之后，每当页面中有绘制发生时，屏幕上就会闪现绿色的方框。如果你看到绿色方框覆盖了整个屏幕，或者覆盖了一些你觉得不应该发生绘制的区域，那么很可能这次绘制是可以被优化的，你就需要看看这次绘制的更多细节了。
+![Pics](https://developers.google.com/web/fundamentals/performance/rendering/images/simplify-paint-complexity-and-reduce-paint-areas/show-paint-rectangles-green.jpg)
+* 打开Timeline中的Paint，会有更多性能细节展现出来。在某一帧的记录上点击paint记录，你就会看到这一帧的绘制分析结果：
+![Pics](https://developers.google.com/web/fundamentals/performance/rendering/images/simplify-paint-complexity-and-reduce-paint-areas/paint-profiler-button.jpg)
+* 点击paint profiler，会打开一个视图，里面会显示绘制了哪些元素、花了多长时间、以及每个具体的paint调用：
+![Pics](https://developers.google.com/web/fundamentals/performance/rendering/images/simplify-paint-complexity-and-reduce-paint-areas/paint-profiler.jpg)
+* 这个分析器能让你了解绘制区域和绘制复杂度（体现为花费了多长时间），这两个方面正好是你可以对绘制做优化的地方（当然我们首先得努力避免绘制的发生，在无法避免的情况下才对绘制做优化）
+
+##### 提升移动或渐变元素的绘制层
+* 绘制并非总是在内存中的单层画面里完成的。实际上，浏览器在必要时将会把一帧画面绘制成多层画面，这种处理方式和思想跟图像处理软件（比如Sketch/GIMP/Photoshop）是一致的，它们都是可以在图像中的某个单个图层上做操作，最后合并所有图层得到最终的图像。
+* 在页面中创建一个新的渲染层的最好方式就是使用CSS属性will-change，Chrome/Opera/Firefox都支持该属性。同时再与transform属性一起使用，就会创建一个新的组合层：
+`.moving-element {
+  will-change: transform;
+}`
+* 对于那些目前还不支持will-change属性、但支持创建渲染层的浏览器，比如Safari和Mobile Safari，你可以使用一个3D transform属性来强制浏览器创建一个新的渲染层：
+`.moving-element {
+  transform: translateZ(0);
+}`
+
+##### 减少绘制区域
+* 有时候尽管把元素提升到了一个单独的渲染层，渲染工作依然是必须的。渲染过程中一个比较有挑战的问题是，浏览器会把两个相邻区域的渲染任务合并在一起进行，这将导致整个屏幕区域都会被绘制。比如，你的页面顶部有一个固定位置的header，而此时屏幕底部有某个区域正在发生绘制的话，整个屏幕都将会被绘制。
+* Note: 在DPI较高的屏幕上，固定定位的元素会自动地被提升到一个它自有的渲染层中。但在DPI较低的设备上却并非如此，我们需要手动实现渲染层的提升。
+
+##### 简化绘制的复杂度
+* 在绘制所涉及的一些问题中，有些问题是相对更耗费昂贵的。比如，绘制一个blur效果（比如阴影）就比绘制其他效果（比如一个红色方框）更费时。然而，在CSS方面，这些问题并非都是显而易见的：background: red和box-shadow: 0, 4px, 4px, rgba(0,0,0,0.5);可能看上去在性能方面没有太大的差别，但事实却并非如此。
+***
+
+
+
+#### 5. 5. 优先使用渲染层合并属性、控制层数量，具体可以做什么？
+1. - 只使用transform/opacity来实现动画效果
+2. - 用will-change/translateZ属性把动画元素提升到单独的渲染层中
+3. - 避免滥用渲染层提升：更多的渲染层需要更多的内存和更复杂的管理
+* 在这部分内容中有两个关键点：需要管理的渲染层的数量、实现动画效果的样式属性。
+
+##### 使用transform/opacity实现动画效果
+* 从性能方面考虑，最理想的渲染流水线是没有布局和绘制环节的，只需要做渲染层的合并即可：
+![Pics](https://developers.google.com/web/fundamentals/performance/rendering/images/stick-to-compositor-only-properties-and-manage-layer-count/frame-no-layout-paint.jpg)
+* 为了实现上述效果，你需要对元素谨慎使用会被修改的样式属性，只能使用那些仅触发渲染层合并的属性。目前，只有两个属性是满足这个条件的：transforms和opacity：
+![Pics](https://developers.google.com/web/fundamentals/performance/rendering/images/stick-to-compositor-only-properties-and-manage-layer-count/safe-properties.jpg)
+* 上图底部的那句提示语的意思是，应用了transforms/opacity属性的元素必须_独占一个渲染层_。为了对这个元素创建一个自有的渲染层，你必须提升该元素。接下来我们来看看如何把一个元素提升到单独的渲染层中。
+
+##### 提升动画效果中的元素
+* 上文中提到过新建渲染层：
+`.moving-element {
+  will-change: transform;
+}`
+
+##### 管理渲染层、避免过多数量的层
+`* {
+  will-change: transform;
+  transform: translateZ(0);
+}`
+* 上面这段代码意味着你想对页面中每个元素都创建一个自有的渲染层。问题是，创建一个新的渲染层并不是免费的，它得消耗额外的内存和管理资源。实际上，在内存资源有限的设备上，由于过多的渲染层来带的开销而对页面渲染性能产生的影响，甚至远远超过了它在性能改善上带来的好处。由于每个渲染层的纹理都需要上传到GPU处理，因此我们还需要考虑CPU和GPU之间的带宽问题、以及有多大内存供GPU处理这些纹理的问题。
+
+##### 使用Chrome DevTools来了解页面中的渲染层的情况
+* 在Timeline面板中开启Paint选项，开启之后，就可以对页面进行渲染性能采样了。当采样过程结束之后，你就能在frames-per-second横条上点击每一个单独的帧，看到每个帧的渲染细节：
+![Pics](https://developers.google.com/web/fundamentals/performance/rendering/images/stick-to-compositor-only-properties-and-manage-layer-count/frame-of-interest.jpg)
+* 点击之后，你就会在视图中看到一个新的选项卡：Layers
+![Pics](https://developers.google.com/web/fundamentals/performance/rendering/images/stick-to-compositor-only-properties-and-manage-layer-count/layer-tab.jpg)
+* 点击这个Layers选项卡，你会看到一个新的视图。在这个视图中，你可以对这一帧中的所有渲染层进行扫描、缩放等操作，同时还能看到每个渲染层被创建的原因
+![Pics](https://developers.google.com/web/fundamentals/performance/rendering/images/stick-to-compositor-only-properties-and-manage-layer-count/layer-view.jpg)
+* 有了这个视图，你就能知道页面中到底有多少个渲染层。如果你在对页面滚动或渐变效果的性能分析中发现渲染层的合并过程耗费了太多时间（相对于4-5毫秒的预期），那么你可以从这个视图里看到页面中有多少个渲染层，它们为何被创建，从而对渲染层的数量进行优化。
 
 
 
 
 
 
-#### 4. 4. 优化JavaScript的执行效率，具体可以做什么？
+#### 6. 6. 对用户输入事件的处理去抖动，具体可以做什么？
+1. - 避免使用运行时间过长的输入事件处理函数，它们会阻塞页面的滚动
+2. - 避免在输入事件处理函数中修改样式属性
+3. - 对输入事件处理函数去抖动，存储事件对象的值，然后在requestAnimationFrame回调函数中修改样式属性
 
+##### 避免使用运行时间过长的输入事件处理函数
+* 在理想情况下，当用户在设备屏幕上触摸了页面上某个位置时，页面的渲染层合并线程将接收到这个触摸事件并作出响应，比如移动页面元素。这个响应过程是不需要浏览器主线程的参与的，也就是说，不会导致JavaScript、布局和绘制过程的发生
+![Pics](https://developers.google.com/web/fundamentals/performance/rendering/images/debounce-your-input-handlers/compositor-scroll.jpg)
 
+* 但是，如果你对这个被触摸的元素绑定了输入事件处理函数，比如touchstart、touchmove或者touchend，那么渲染层合并线程必须等待这些被绑定的处理函数的执行完毕之后才能被执行。因为你可能在这些处理函数中调用了类似preventDefault()的函数，这将会阻止输入事件（touch/scroll等）的默认处理函数的运行。事实上，即便你没有在事件处理函数中调用preventDefault()，渲染层合并线程也依然会等待，也就是用户的滚动页面操作被阻塞了，表现出的行为就是滚动出现延迟或者卡顿（帧丢失）
+![Pics](https://developers.google.com/web/fundamentals/performance/rendering/images/debounce-your-input-handlers/ontouchmove.jpg)
+* 简而言之，你必须确保对用户输入事件绑定的任何处理函数都能够快速执行完毕，以便腾出时间来让渲染层合并线程来完成它的工作
 
+##### 避免在输入事件处理函数中修改样式属性
+* 输入事件处理函数，比如scroll/touch事件的处理，都会在requestAnimationFrame之前被调用执行。
+* 因此，如果你在上述输入事件的处理函数中做了修改样式属性的操作，那么这些操作会被浏览器暂存起来。然后在调用requestAnimationFrame的时候，如果你在一开始做了读取样式属性的操作，那么根据“避免大规模、复杂的布局”中所述，你将会触发浏览器的强制同步布局过程！
+![Pics](https://developers.google.com/web/fundamentals/performance/rendering/images/debounce-your-input-handlers/frame-with-input.jpg)
 
+##### 对滚动事件处理函数去抖动
+* 有一个方法能同时解决上面的两个问题：对样式修改操作去抖动，控制其仅在下一次requestAnimationFrame中发生：
+`function onScroll (evt) {
 
-#### 5. 5. 优化JavaScript的执行效率，具体可以做什么？
+  // Store the scroll value for laterz.
+  lastScrollY = window.scrollY;
 
+  // Prevent multiple rAF callbacks.
+  if (scheduledAnimationFrame)
+    return;
 
+  scheduledAnimationFrame = true;
+  requestAnimationFrame(readAndUpdatePage);
+}
 
+window.addEventListener('scroll', onScroll);`
+* 这么做还有一个额外的好处，就是能使你的事件处理函数变得轻量。这很关键，因为它能使包含复杂计算代码的页面也能快速响应scroll/touch事件！
+***
 
-
-#### 6. 6. 优化JavaScript的执行效率，具体可以做什么？
-
-
-
-
-
+### 7、录制过程中截屏
+* 选中Screenshots后录制，概览窗口下方会展现截屏短片，鼠标移上会有放大展示。鼠标从左移到右，可模仿记录过程的动画。
+![Pics](https://developers.google.com/web/tools/chrome-devtools/evaluate-performance/animations/hover.mp4)
 
 
 
