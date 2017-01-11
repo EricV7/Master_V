@@ -67,7 +67,8 @@
 ##### 查看录制详情：
 * 当选中火焰图中的某事件时，详情界面会展示该事件相关的额外信息；
 ![Pics](https://developers.google.com/web/tools/chrome-devtools/evaluate-performance/imgs/details-pane.png)
-* Summary：所有事件类型
+
+##### timeline的通用事件属性：
 * Aggregated time：当事件是嵌套事件时，各类型事件的时耗
 * Call Stack：含有子事件的事件 的各类型时耗
 * CPU time：事件占用CPU的时耗
@@ -76,9 +77,7 @@
 * Self time：该事件（不包括其子事件）耗时
 * Used Heap Size：事件执行时所占用的内存
 
-##### TimeLine中的事件汇总：
-
-###### Loading事件
+##### Loading事件
 事件             | 描述    
 -------------    | -------------
 Parse HTML       | 浏览器执行HTML解析 
@@ -87,7 +86,17 @@ Receive Data     | 请求的响应数据到达事件，如果响应数据很大�
 Receive Response | 响应头报文到达时触发    
 Send Request     | 发送网络请求时触发       
 
-###### Scripting事件
+##### Loading事件属性
+属性             | 描述    
+-------------    | -------------
+Resource       | 请求资源的url 
+Preview   | 请求的资源预览（仅图片）
+Request Method     | 请求时发送的HTTP方法 （如Get或Post）
+Status Code | HTTP响应码    
+MIME Type     | 请求资源的MIME类型
+Encoded Data Length     | 请求资源的字节长度
+
+##### Scripting事件
 事件             | 描述    
 -------------    | -------------
 Animation Frame Fired       |   事件描述一个定义好的动画帧发生并在回调处理时触发
@@ -101,7 +110,15 @@ Event     | js事件(如mousedown等)
 XHR Ready State Change | 当一个异步请求为就绪状态后触发
 XHR Load  | 当一个异步请求完成加载后触发
 
-###### Rendering事件
+##### Scripting事件属性
+事件             | 描述    
+-------------    | -------------
+Timer ID       |   计时器ID
+Timeout        |   计时器延时
+Repeats         |   计时器是否重复的标识
+Function Call   |    被调用的函数
+
+##### Rendering事件
 事件             | 描述    
 -------------    | -------------
 Invalidate layout   | 当DOM更改导致页面布局失效时触发
@@ -109,7 +126,17 @@ Layout   | 页面布局计算执行时触发
 Recalculate style   | Chrome重新计算元素样式时触发
 Scroll | 内嵌的视窗滚动时触发 
 
-###### Painting事件
+##### Rendering事件属性
+事件             | 描述    
+-------------    | -------------
+Layout invalidated   | Layout记录中的，无效布局
+Nodes that need layout   | Layout记录中，页面重新前需完成布局的节点数
+Layout tree size   | Layout记录中，Chrome重新布局时的所有节点数
+Layout scope | 可供布局的范围值 
+Elements affected | Recalculate style记录中，样式重绘影响的元素数 
+Styles invalidated	 | Recalculate style记录中的,无效样式 
+
+##### Painting事件
 事件             | 描述    
 -------------    | -------------
 Composite Layers   | Chrome的渲染引擎完成图片层合并时触发
@@ -117,8 +144,8 @@ Image Decode   | 一个图片资源完成解码后触发
 Image Resize   | 一个图片被修改尺寸后触发
 Paint | 合并后的层被绘制到对应显示区域后触发
 
-###### Painting事件
-事件             | 描述    
+##### Painting事件属性
+属性             | 描述    
 -------------    | -------------
 Location   | 绘制事件对象的坐标，及布局
 Dimensions   | 绘制事件对象的大小
