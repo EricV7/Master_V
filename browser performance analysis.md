@@ -20,10 +20,9 @@
 ##### 渲染树布局
 ##### ↓ 将布局绘制（paint）在屏幕上
 ##### 绘制渲染树
-
 ***
 
-### 4、开发者工具的Timeline面板
+### 3、开发者工具的Timeline面板
 ##### Timeline面板概述
 * 控制栏 - 控制录制等相关信息
 * 概况栏 - 页面性能概况
@@ -125,20 +124,78 @@ Paint | 合并后的层被绘制到对应显示区域后触发
 -------------    | -------------
 Location   | 绘制事件对象的坐标，及布局
 Dimensions   | 绘制事件对象的大小
-
-##### 右键功能：
-* 保存、读取Timeline录制数据
-
 ***
+
 以下三种情况，会导致网页重新渲染。
 * 修改DOM
 * 修改样式表
 * 用户事件（比如鼠标悬停、页面滚动、输入框键入文字、改变窗口大小等等）
-  
-##### 重新渲染，就需要重新生成布局和重新绘制。前者叫做"重排"（reflow），后者叫做"重绘"（repaint）。
-##### 需要注意的是，"重绘"不一定需要"重排"，比如改变某个网页元素的颜色，就只会触发"重绘"，不会触发"重排"，因为布局没有改变。但是，"重排"必然导致"重绘"，比如改变一个网页元素的位置，就会同时触发"重排"和"重绘"，因为布局改变了。 
+##### DOM的性能问题
+* 核心问题：当解析的html文件很大时，生成DOM树占用内存较大，同时遍历（不更新）元素耗时也更长。但这都不是重点，DOM的核心问题是：DOM修改导致的页面重绘、重新排版！重新排版是用户阻塞的操作，同时，如果频繁重排，CPU使用率也会猛涨！
+* 重新渲染，就需要重新生成布局和重新绘制。前者叫做"重排"（reflow），后者叫做"重绘"（repaint）。
+> DOM操作会导致一系列的重绘（repaint）、重新排版（reflow）操作。为了确保执行结果的准确性，所有的修改操作是按顺序同步执行的。大部分浏览器都不会在
+> JavaScript的执行过程中更新DOM。相应的，这些浏览器将对对 DOM的操作放进一个队列，并在JavaScript脚本执行完毕以后按顺序一次执行完毕。也就是说，在
+> JavaScript执行的过程，直到发生重新排版，用户一直被阻塞。
+> 一般的浏览器中（不含IE），repaint的速度远快于reflow，所以避免reflow更重要。
+* 需要注意的是，"重绘"不一定需要"重排"，比如改变某个网页元素的颜色，就只会触发"重绘"，不会触发"重排"，因为布局没有改变。但是，"重排"必然导致"重绘"，比如改变一个网页元素的位置，就会同时触发"重排"和"重绘"，因为布局改变了。
+###### 解决问题的关键是：减少因DOM操作，引起的reflow。
+1. 1. 在DOM外，执行尽量多的变更操作。Demo：
+```
+// 不好的做法
+for (var i=0; i < items.length; i++){
+    var item = document.createElement("li");
+    item.appendChild(document.createTextNode("Option " + i);
+    list.appendChild(item);
+}
+
+// 更好的做法
+// 使用容器存放临时变更， 最后再一次性更新DOM
+var fragment = document.createDocumentFragment();
+for (var i=0; i < items.length; i++){
+    var item = document.createElement("li");
+    item.appendChild(document.createTextNode("Option " + i);
+    fragment.appendChild(item);
+}
+list.appendChild(fragment);
+```
+2. 2. 操作DOM前，先把DOM节点删除或隐藏，因为隐藏的节点不会触发重排。Demo如下：
+```
+list.style.display = "none";  
+for (var i=0; i < items.length; i++){  
+    var item = document.createElement("li");  
+    item.appendChild(document.createTextNode("Option " + i);  
+    list.appendChild(item);  
+}  
+list.style.display = "";  
+```
+3. 3. 一次性，修改样式属性。Demo如下：
+```
+// 不好的做法
+// 这种做法会触发多次重排
+element.style.backgroundColor = "blue";  
+element.style.color = "red";  
+element.style.fontSize = "12em";
+
+// 更好的做法是，把样式都放在一个class下
+.newStyle {  
+    background-color: blue;  
+    color: red;  
+    font-size: 12em;  
+}  
+element.className = "newStyle";
+```
+4. 4. 使用缓存，缓存临时节点。
+```
+// 不好的做法
+document.getElementById("myDiv").style.left = document.getElementById("myDiv").offsetLeft +  
+document.getElementById("myDiv").offsetWidth + "px";  
+// 更好的做法
+var myDiv = document.getElementById("myDiv");  
+myDiv.style.left = myDiv.offsetLeft + myDiv.offsetWidth + "px";
+```
 
 ***
+
 ### 4、对于性能的影响
 
 ##### 重排和重绘会不断触发，这是不可避免的。但是，它们非常耗费资源，是导致网页性能低下的根本原因。提高网页性能，就是要降低"重排"和"重绘"的频率和成本，尽量少触发重新渲染。
