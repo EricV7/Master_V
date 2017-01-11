@@ -373,6 +373,7 @@ function resizeAllParagraphsToMatchBlockWidth() {
 ![Pics](https://developers.google.com/web/fundamentals/performance/rendering/images/simplify-paint-complexity-and-reduce-paint-areas/show-paint-rectangles.jpg)
 * 打开了Chrome的这个选项之后，每当页面中有绘制发生时，屏幕上就会闪现绿色的方框。如果你看到绿色方框覆盖了整个屏幕，或者覆盖了一些你觉得不应该发生绘制的区域，那么很可能这次绘制是可以被优化的，你就需要看看这次绘制的更多细节了。
 ![Pics](https://developers.google.com/web/fundamentals/performance/rendering/images/simplify-paint-complexity-and-reduce-paint-areas/show-paint-rectangles-green.jpg)
+
 * 打开Timeline中的Paint，会有更多性能细节展现出来。在某一帧的记录上点击paint记录，你就会看到这一帧的绘制分析结果：
 ![Pics](https://developers.google.com/web/fundamentals/performance/rendering/images/simplify-paint-complexity-and-reduce-paint-areas/paint-profiler-button.jpg)
 * 点击paint profiler，会打开一个视图，里面会显示绘制了哪些元素、花了多长时间、以及每个具体的paint调用：
@@ -397,8 +398,6 @@ function resizeAllParagraphsToMatchBlockWidth() {
 ##### 简化绘制的复杂度
 * 在绘制所涉及的一些问题中，有些问题是相对更耗费昂贵的。比如，绘制一个blur效果（比如阴影）就比绘制其他效果（比如一个红色方框）更费时。然而，在CSS方面，这些问题并非都是显而易见的：background: red和box-shadow: 0, 4px, 4px, rgba(0,0,0,0.5);可能看上去在性能方面没有太大的差别，但事实却并非如此。
 ***
-
-
 
 #### 5. 5. 优先使用渲染层合并属性、控制层数量，具体可以做什么？
 1. - 只使用transform/opacity来实现动画效果
@@ -434,11 +433,7 @@ function resizeAllParagraphsToMatchBlockWidth() {
 * 点击这个Layers选项卡，你会看到一个新的视图。在这个视图中，你可以对这一帧中的所有渲染层进行扫描、缩放等操作，同时还能看到每个渲染层被创建的原因
 ![Pics](https://developers.google.com/web/fundamentals/performance/rendering/images/stick-to-compositor-only-properties-and-manage-layer-count/layer-view.jpg)
 * 有了这个视图，你就能知道页面中到底有多少个渲染层。如果你在对页面滚动或渐变效果的性能分析中发现渲染层的合并过程耗费了太多时间（相对于4-5毫秒的预期），那么你可以从这个视图里看到页面中有多少个渲染层，它们为何被创建，从而对渲染层的数量进行优化。
-
-
-
-
-
+***
 
 #### 6. 6. 对用户输入事件的处理去抖动，具体可以做什么？
 1. - 避免使用运行时间过长的输入事件处理函数，它们会阻塞页面的滚动
@@ -479,7 +474,29 @@ window.addEventListener('scroll', onScroll);`
 
 ### 7、录制过程中截屏
 * 选中Screenshots后录制，概览窗口下方会展现截屏短片，鼠标移上会有放大展示。鼠标从左移到右，可模仿记录过程的动画。
-![Pics](https://developers.google.com/web/tools/chrome-devtools/evaluate-performance/animations/hover.mp4)
+***
 
+### 8、Profile JavaScript
+* 选中JS Profile后录制，图表中会记录每个js函数的调用耗时详情
+***
 
+### 9、Profile painting
+* 选中Paint后录制，会对paint的事件有更深入的详情展示。当点击一个paint事件时，在Details栏 会出现一个paint profiler新tab标签，以颗粒状展示更多详情。
+![Pics](https://developers.google.com/web/tools/chrome-devtools/evaluate-performance/imgs/paint-profiler.png)
+***
 
+### 10、Rendering settings
+* 打开DevTools菜单，按esc开启或关闭该栏。选择More tools > Rendering settings进入rendering settings页面，对诊断paint问题有所帮助。
+![Pics](https://developers.google.com/web/tools/chrome-devtools/evaluate-performance/imgs/rendering-settings.png)
+***
+
+### 11、Search records
+* 当想聚焦多种事件中的一种时，可Ctrl+F搜索，例如搜HTML。搜索只作用于选取的这个时间段。
+***
+
+### 12、Zoom in on a Timeline section
+* 点击概览区域，可聚焦某一时间段的性能展现，其他图会跟随联动。
+***
+
+### 13、Save and load recordings
+* 可供保存和读取Timeline数据
