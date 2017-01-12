@@ -1,5 +1,5 @@
 # 主要讲解内容：timeline工具的使用与诊断、浏览器的任务队列、页面的性能分析与优化，
-## 一、浏览器加载、渲染及性能分析：
+## 一、浏览器加载、渲染及timeline工具使用：
 ### 1、建立连接过程
 
 #### (1) 浏览器查找域名的IP地址
@@ -51,7 +51,7 @@
 ##### 工具栏：
 * JS Profile：开启时，绘制图表展现录制过程中每个被调用的函数消耗资源情况
 * Paint：开启时，会获取更多绘制相关事件的信息，选中某一绘图函数，开启paint profiler颗粒信息窗口（支持ctrl+F所搜具体事件功能）
-* Memory：开启时，打开内存视图栏
+* Memory：开启时，打开内存展示栏，展示页面记录过程中的内存占用情况
 ##### 概览窗口：
 1. FPS.（每秒帧数） 绿色bar越高，FPS越高。FPS图表上的红色色块代表长帧动画，可以理解为可供优化的地方；
 2. CPU.（CPU资源） 不同类别的事件消耗CPU资源的情况；
@@ -71,15 +71,16 @@
 ![Pics](https://developers.google.com/web/tools/chrome-devtools/evaluate-performance/imgs/details-pane.png)
 
 ##### timeline的通用事件属性：
-* Aggregated time：当事件是嵌套事件时，各类型事件的时耗
-* Call Stack：含有子事件的事件 的各类型时耗
+* Aggregated time：对于有嵌套事件的事件，各类型事件的时耗
+* Call Stack：对于有子事件的事件 的各类型时耗
 * CPU time：事件占用CPU的时耗
 * Details：该事件的其他细节
-* Duration(at time-stamp)：该事件及其子事件执行完的时间
+* Duration(at time-stamp)：该事件及其子事件执行完的时间;该时间点是相对于记录开始时，事件发生的时间
 * Self time：该事件（不包括其子事件）耗时
-* Used Heap Size：事件执行时所占用的内存
+* Total time：该事件（包括其子事件）耗时
+* Used Heap Size：事件记录期间应用占用的内存大小，和取样期间堆空间使用的变化。
 
-##### Summary面板事件类型列表
+##### Summary面板及Event Log事件类型列表
 类型             | 描述    
 -------------    | -------------
 send request       | 发送请求
@@ -99,7 +100,7 @@ pevaluate script     | 评估脚本
 rasterize | 栅格化
 
 ##### Loading事件
-事件             | 描述    
+事件             | 描述    
 -------------    | -------------
 Parse HTML       | 浏览器执行HTML解析 
 Finish Loading   | 网络请求完毕事件
@@ -113,65 +114,69 @@ Send Request     | 发送网络请求时触发
 Resource       | 请求资源的url 
 Preview   | 请求的资源预览（仅图片）
 Request Method     | 请求时发送的HTTP方法 （如Get或Post）
-Status Code | HTTP响应码    
-MIME Type     | 请求资源的MIME类型
+Status Code | HTTP的状态码，如200、404等
+MIME Type     | 请求资源的MIME（媒体）类型，如HTML、XML、GIF和Flash等
 Encoded Data Length     | 请求资源的字节长度
 
 ##### Scripting事件
 事件             | 描述    
 -------------    | -------------
-Animation Frame Fired       |   事件描述一个定义好的动画帧发生并在回调处理时触发
-Cancel Animation Frame      |   取消一个动画帧时触发
+Animation Frame Fired       |   一个预定的动画帧出发并在回调处理时被调用
+Cancel Animation Frame      |   取消一个动画帧时触发
 GC Event                    |   垃圾回收时触发
 DOMContentLoaded     |     当页面中的DOM内容加载并解析完毕时触发   
 Event                |     js事件(如mousedown等)
 Function Call        |     创建计时器（调用setTimeout()和setInterval()）时触发
-Remove Timer         |  当清除一个计时器时触发
+Request Animation Frame  |  调用requestAnimationFrame()函数来调度新的帧
+Remove Timer         |  将之前创建的定时器清除
 Event     | js事件(如mousedown等)
+Time  |  调用console.time()时触发
+Time End  |  调用console.timeEnd()时触发
 XHR Ready State Change | 当一个异步请求为就绪状态后触发
 XHR Load  | 当一个异步请求完成加载后触发
 
 ##### Scripting事件属性
 事件             | 描述    
 -------------    | -------------
-Timer ID       |   计时器ID
-Timeout        |   计时器延时
-Repeats         |   计时器是否重复的标识
+Timer ID       |   定时器ID
+Timeout        |   定时器指定的超时时间
+Repeats         |   定时器是否循环的标识
 Function Call   |    被调用的函数
 
 ##### Rendering事件
 事件             | 描述    
 -------------    | -------------
-Invalidate layout   | 当DOM更改导致页面布局失效时触发
-Layout   | 页面布局计算执行时触发
+Invalidate layout   | 变化的DOM的布局无效
+Layout   | 页面计算布局时触发
 Recalculate style   | Chrome重新计算元素样式时触发
 Scroll | 内嵌的视窗滚动时触发 
 
 ##### Rendering事件属性
 事件             | 描述    
 -------------    | -------------
-Layout invalidated   | Layout记录中的，无效布局
-Nodes that need layout   | Layout记录中，页面重新前需完成布局的节点数
-Layout tree size   | Layout记录中，Chrome重新布局时的所有节点数
+Layout invalidated   | 导致无效布局的代码堆栈。
+Nodes that need layout   | 重新布局前需要布局的节点数。这通常是由开发者的代码无效导致的
+Layout tree size   | 根布局（Chrome开始布局的节点）下节点总数
 Layout scope | 可供布局的范围值 
 Elements affected | Recalculate style记录中，样式重绘影响的元素数 
-Styles invalidated	 | Recalculate style记录中的,无效样式 
+Styles invalidated	 | Recalculate style记录中的,导致无效样式 的代码堆栈
 
 ##### Painting事件
 事件             | 描述    
 -------------    | -------------
 Composite Layers   | Chrome的渲染引擎完成图片层合并时触发
-Image Decode   | 一个图片资源完成解码后触发
-Image Resize   | 一个图片被修改尺寸后触发
+Image Decode   | 图像解码后触发
+Image Resize   | 图像尺寸变化后触发
 Paint | 合并后的层被绘制到对应显示区域后触发
 
 ##### Painting事件属性
 属性             | 描述    
 -------------    | -------------
-Location   | 绘制事件对象的坐标，及布局
-Dimensions   | 绘制事件对象的大小
+Location   | 绘制事件对象的x、y坐标
+Dimensions   | 绘制事件对象的宽度和高度
 ***
 
+## 二、页面性能分析及优化：
 以下三种情况，会导致网页重新渲染。
 * 修改DOM
 * 修改样式表
@@ -608,7 +613,7 @@ window.addEventListener('scroll', onScroll);`
 * 可供保存和读取Timeline数据
 ***
 
-## 二、Web性能测试工具：
+## 三、常用Web性能测试工具介绍：
 #### 基于网页分析工具：
 * 1. 阿里测
 * 2. 百度应用性能检测中心
