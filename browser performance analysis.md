@@ -77,6 +77,26 @@
 * Self time：该事件（不包括其子事件）耗时
 * Used Heap Size：事件执行时所占用的内存
 
+##### Summary面板事件类型列表
+类型             |  描述
+-------------    | -------------
+send request   |	发送请求
+evaluate script	 |  评估脚本
+parse html	|  html解析
+recalculate style  |	重新计算显示样式
+layout  |	计算布局
+paint setup  |	绘制设置【准备绘制】
+paint	|  绘制
+composite layers |	组合层
+timer fired |	触发定时器
+function call |	函数调用
+receive data  |	接收数据
+receive response |	接受响应
+finish loading | 结束加载
+GC event |	浏览器垃圾回收
+pevaluate script |	评估脚本
+rasterize |	栅格化
+
 ##### Loading事件
 事件             | 描述    
 -------------    | -------------
