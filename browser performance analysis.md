@@ -28,8 +28,11 @@
 * 控制栏 - 控制录制等相关信息
 * 概况栏 - 页面性能概况
 * 火焰图 - CPU性能的形象展现（三条虚线：蓝-DOM文本加载完毕时间；绿-最初开始绘制的时间；红-加载脚本等的事件）
+* 内存视图 - 展示录制过程中，页面操作所占内存情况（JS Heap-JS堆栈占用量；Documents-加载文档数；Nodes-Dom节点计数，即已创建的保存在内存中尚未被垃圾回收的Dom节点数；Listeners-事件监听数；GPU Memory-）
 * 损耗性能详情部分（后面详细介绍）{#index}
 ![Pics](https://developers.google.com/web/tools/chrome-devtools/evaluate-performance/imgs/timeline-annotated.png)
+
+> 一个帧的完整绘制，常常需要CPU和GPU的共同完成。GPU可等同于CPU的小弟，听候吩咐完成一些图像绘制的简单计算。有时GPU未完成上一帧的工作，CPU已经完成了下一帧的工作，而有时候GPU快速的完成了第一帧的绘制工作，而CPU繁忙，还不能及时交给GPU第二帧图像的绘制，都会一定程度上导致IDLE时间。这便是这些CPU和GPU的2帧空隙时间的由来。
 
 ##### 基本使用方法：
 * 录制一段页面加载过程 或 用户操作过程的记录；
@@ -80,22 +83,22 @@
 ##### Summary面板事件类型列表
 类型             |  描述
 -------------    | -------------
-send request   |	发送请求
-evaluate script	 |  评估脚本
-parse html	|  html解析
-recalculate style  |	重新计算显示样式
-layout  |	计算布局
-paint setup  |	绘制设置【准备绘制】
-paint	|  绘制
-composite layers |	组合层
-timer fired |	触发定时器
-function call |	函数调用
-receive data  |	接收数据
-receive response |	接受响应
-finish loading | 结束加载
-GC event |	浏览器垃圾回收
-pevaluate script |	评估脚本
-rasterize |	栅格化
+send request   |   发送请求
+evaluate script	 | 评估脚本
+parse html  |  html解析
+recalculate style  |  重新计算显示样式
+layout  |  计算布局
+paint setup  | 	 绘制设置【准备绘制】
+paint  |  绘制
+composite layers  |  组合层
+timer fired  |  触发定时器
+function call  |  函数调用
+receive data  |  接收数据
+receive response |  接受响应
+finish loading  | 结束加载
+GC event  |  浏览器垃圾回收（这可能是前面的脚本运行时定义了太多的全局性变量所致。实际上这样的变量应该封装到模块里去，而不是交给顶层window，局部变量能提高脚本运行速度）
+pevaluate script  |  评估脚本
+rasterize  |  栅格化
 
 ##### Loading事件
 事件             | 描述    
