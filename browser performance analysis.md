@@ -348,6 +348,7 @@ dataSortWorker.addEventListener('message', function(evt) {
 ![Pics](https://developers.google.com/web/fundamentals/performance/rendering/images/optimize-javascript-execution/low-js-detail.jpg)
 * 如发现运行时间很长的JavaScript代码，可开启DevTools中顶部的JavaScript profiler选项（不过此项的运行本身也会消耗 一些性能）因此，确保只有在你需要查看更多运行时细节的时候才开启它。开启这个选项之后，再执行一次页面分析动作，你会看到更多细节：
 ![Pics](https://developers.google.com/web/fundamentals/performance/rendering/images/optimize-javascript-execution/high-js-detail.jpg)
+* 黄色和紫色的内容比较多，说明这个页面是脚本密集型的应用，估计地图类页面都是这样，JavaScript需要加载大量的瓦片图到DOM里，而且需要处理坐标和渲染等问题
 
 #### 避免对JavaScript代码进行微优化
 * 对于一个任务，如果换一种实现方式，浏览器的执行速度可以快100倍的话，是非常酷的。比如，读取一个元素的offsetTop属性就比计算它的getBoundingClientRect()要快。但一般情况下，在每一帧中运行的JavaScript代码之中调用这些函数的次数都是有限的。因此，在这些微优化上花再大的精力，整体上JavaScript代码的性能可能也就获得若干毫秒的提升。这是不划算的。
