@@ -81,7 +81,7 @@
 * Used Heap Size：事件执行时所占用的内存
 
 ##### Summary面板事件类型列表
-事件             | 描述    
+类型             | 描述    
 -------------    | -------------
 send request       | 发送请求
 parse html   | html解析
