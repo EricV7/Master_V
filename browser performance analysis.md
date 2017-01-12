@@ -57,16 +57,16 @@
 * 其中，蓝色表示HTML文件；黄色为Scripts文件；紫色为Stylesheets文件；绿色为Media文件；灰色为其他混杂资源（可以理解为浏览器内部c++的一些工作，和前端js以及渲染关系不大，也有说是没有被DevTools感知到的活动）；空白区块：显示刷新周期（display refresh cycles）中的空闲时间段
 ![Pics](https://developers.google.com/web/tools/chrome-devtools/evaluate-performance/imgs/overview-annotated.jpg)
 
-##### 查看录制详情：
-* 当选中火焰图中的某事件时，详情界面会展示该事件相关的额外信息；
-![Pics](https://developers.google.com/web/tools/chrome-devtools/evaluate-performance/imgs/details-pane.png)
-
 ##### 5种颜色表示不同类别事件：
 * 蓝色：网络通信和HTML解析
 * 黄色：JavaScript执行
 * 紫色：样式计算和布局，即重排
 * 绿色：重绘
 * 灰色：混杂的资源
+
+##### 查看录制详情：
+* 当选中火焰图中的某事件时，详情界面会展示该事件相关的额外信息；
+![Pics](https://developers.google.com/web/tools/chrome-devtools/evaluate-performance/imgs/details-pane.png)
 
 ##### timeline的通用事件属性：
 * Aggregated time：当事件是嵌套事件时，各类型事件的时耗
