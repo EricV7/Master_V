@@ -27,8 +27,8 @@
 ##### Timeline面板概述
 * 控制栏 - 控制录制等相关信息
 * 概况栏 - 页面性能概况
-* 火焰图 - CPU性能的形象展现（三条虚线：蓝-DOM文本加载完毕时间；绿-最初开始绘制的时间；红-加载脚本等的事件）
-* 内存视图 - 展示录制过程中，页面操作所占内存情况（JS Heap-JS堆栈占用量；Documents-加载文档数；Nodes-Dom节点计数，即已创建的保存在内存中尚未被垃圾回收的Dom节点数；Listeners-事件监听数；GPU Memory-）
+* 火焰图 - CPU性能的形象展现（三条虚线：蓝-DOM文本加载完毕时间；绿-最初开始准备绘制的时间；红-开始布局的事件）
+* 内存视图 - 展示录制过程中，页面操作所占内存情况（JS Heap-JS堆栈占用量；Documents-加载文档数；Nodes-Dom节点计数，即已创建的保存在内存中尚未被垃圾回收的Dom节点数；Listeners-事件监听数；GPU Memory-图像处理内存）
 * 损耗性能详情部分（后面详细介绍）{#index}
 ![Pics](https://developers.google.com/web/tools/chrome-devtools/evaluate-performance/imgs/timeline-annotated.png)
 
@@ -63,7 +63,7 @@
 * 蓝色：网络通信和HTML解析
 * 黄色：JavaScript执行
 * 紫色：样式计算和布局，即重排
-* 绿色：重绘
+* 绿色：绘制
 * 灰色：混杂的资源
 
 ##### 查看录制详情：
