@@ -304,15 +304,15 @@ div.style.top = top + 10 + "px";`
 
 1. 1. JS / CSS > 计算样式 > 布局 > 绘制 > 渲染层合并
 ![Pics](https://developers.google.com/web/fundamentals/performance/rendering/images/intro/frame-full.jpg)
-* 如果你修改一个DOM元素的”layout”属性，也就是改变了元素的样式（比如宽度、高度或者位置等），那么浏览器会检查哪些元素需要重新布局，然后对页面激发一个reflow过程完成重新布局。被reflow的元素，接下来也会激发绘制过程，最后激发渲染层合并过程，生成最后的画面。
+- 如果你修改一个DOM元素的”layout”属性，也就是改变了元素的样式（比如宽度、高度或者位置等），那么浏览器会检查哪些元素需要重新布局，然后对页面激发一个reflow过程完成重新布局。被reflow的元素，接下来也会激发绘制过程，最后激发渲染层合并过程，生成最后的画面。
 
 2. 2. JS / CSS > 计算样式 > 绘制 > 渲染层合并
 ![Pics](https://developers.google.com/web/fundamentals/performance/rendering/images/intro/frame-no-layout.jpg)
-* 如果你修改一个DOM元素的“paint only”属性，比如背景图片、文字颜色或阴影等，这些属性不会影响页面的布局，因此浏览器会在完成样式计算之后，跳过布局过程，只做绘制和渲染层合并过程。
+- 如果你修改一个DOM元素的“paint only”属性，比如背景图片、文字颜色或阴影等，这些属性不会影响页面的布局，因此浏览器会在完成样式计算之后，跳过布局过程，只做绘制和渲染层合并过程。
 
 3. 3. JS / CSS > 计算样式 > 渲染层合并
 ![Pics](https://developers.google.com/web/fundamentals/performance/rendering/images/intro/frame-no-layout-paint.jpg)
-* 如果你修改一个非样式且非绘制的CSS属性，那么浏览器会在完成样式计算之后，跳过布局和绘制的过程，直接做渲染层合并。第三种方式在性能上是最理想的，对于动画和滚动这种负荷很重的渲染，我们要争取使用第三种渲染流程。
+- 如果你修改一个非样式且非绘制的CSS属性，那么浏览器会在完成样式计算之后，跳过布局和绘制的过程，直接做渲染层合并。第三种方式在性能上是最理想的，对于动画和滚动这种负荷很重的渲染，我们要争取使用第三种渲染流程。
 *** 
 
 ### 6、结合渲染流程怎么优化渲染性能呢？
