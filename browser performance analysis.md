@@ -566,21 +566,7 @@ function resizeAllParagraphsToMatchBlockWidth() {
 ![Pics](https://developers.google.com/web/fundamentals/performance/rendering/images/debounce-your-input-handlers/frame-with-input.jpg)
 
 ##### 对滚动事件处理函数去抖动
-* 有一个方法能同时解决上面的两个问题：对样式修改操作去抖动，控制其仅在下一次requestAnimationFrame中发生：
-`function onScroll (evt) {
-
-  // Store the scroll value for laterz.
-  lastScrollY = window.scrollY;
-
-  // Prevent multiple rAF callbacks.
-  if (scheduledAnimationFrame)
-    return;
-
-  scheduledAnimationFrame = true;
-  requestAnimationFrame(readAndUpdatePage);
-}
-
-window.addEventListener('scroll', onScroll);`
+* 有一个方法能同时解决上面的两个问题：对样式修改操作去抖动，控制其仅在下一次requestAnimationFrame中发生
 * 这么做还有一个额外的好处，就是能使你的事件处理函数变得轻量。这很关键，因为它能使包含复杂计算代码的页面也能快速响应scroll/touch事件！
 ***
 
