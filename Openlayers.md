@@ -1,8 +1,7 @@
 > ##本文概要：
 > ### 1.OpenLayers 3介绍
 > ### 2.面相对象概念的介绍
-> ### 3.地图组成部分
-> ### 4.preserveAspectRatio
+> ### 3.OpenLayers 3地图组成部分
 
 ### OpenLayers 3介绍
 #### OpenLayers 3简称ol3，它是一个开源的Web GIS引擎，使用了JavaScript、最新的HTML5技术及CSS技术，支持dom，canvas和webgl三种渲染方式。
