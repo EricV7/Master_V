@@ -44,7 +44,7 @@
 
 ---
 ### 面向对象的编程方法具有四个基本特征：
- · 抽象：就是忽略一个主题中与当前目标无关的那些方面，以便更充分地注意与当前目标有关的方面。
+ · 抽象：是忽略一个主题中与当前目标无关的方面，以便更充分地注意与当前目标有关的方面。
  · 继承：继承是一种联结类的层次模型，并且允许和鼓励类的重用，它提供了一种明确表述共性的方法。
  · 封装：封装是面向对象的特征之一，是对象和类概念的主要特性。
  · 多态性：多态性是指允许不同类的对象对同一消息作出响应
@@ -59,6 +59,7 @@
 #### 交互(Interaction)，这是所有软件都具备的一个组成部分，直观看不到，其实现类放在包ol.interaction下面，控制上层输入和底层之间的交互。
 
 OpenLayer 3采用这样的模块化设计，不管是在实现上，还是对外提供API，都简化了整个系统。为此，在掌握某一部分后，就可以有效地处理这一部分的开发工作，从而不一定要掌握所有组成部分。
+可查看例子baseMap.html。
 
 > 视图(View)
 #### 坐标系及投影
@@ -66,6 +67,7 @@ OpenLayer 3采用这样的模块化设计，不管是在实现上，还是对外
  · WGS84：全称World Geodetic System 1984，是为GPS全球定位系统使用而建立的坐标系统。1996年，National Imagery and Mapping Agency (NIMA) 为美国国防部 (U.S.Department of Defense, DoD)做了一个新的坐标系统。这样实现了新的WGS版本WGS（G873）。其因为加入了美国海军天文台和北京站的改正，其东部方向加入了31-39cm 的改正。所有的其他坐标都有在1分米之内的修正。
  · 投影：是为了把不可展的椭球面描绘到平面上，它使用几何透视方法或数学分析的方法，将地球上的点和线投影到可展的曲面(平面、园柱面或圆锥面)上，再将此可展曲面展成平面，建立该平面上的点、线和地球椭球面上的点、线的对应关系。
  · OpenLayers 3支持两种投影（默认使用后者）：一个是EPSG:4326，等同于WGS84坐标系墨卡托投影(Mercator Projection)；另一个是EPSG:3857，等同于900913，由Mercator投影而来，经常用于web地图。
+ · 默认情况下，从左向右为x正方向，从下向上为y轴正方向。
  · 有时需要进行坐标转换，要定义好投影方式：
  ```html
 <body>
@@ -90,42 +92,44 @@ OpenLayer 3采用这样的模块化设计，不管是在实现上，还是对外
     </script>
 </body>
 ```
+ · 参考例子LinkedMap.html 、 switchMap.html 和 limitedMap.html
+
+#### source 和 layer
+ > GIS还需要加载很多其他的信息，比如街道名称，商店名称，公交站点，道路等等。那么在OpenLayers 3中，具体该如何把这些添加在地图上呢？
+ > 首先需要明白的一点是，Source和Layer是一对一的关系，有一个Source，必然需要一个Layer，然后把这个Layer添加到Map上；
+ > 归纳起来共三种：ol.source.Tile，ol.source.Image和ol.source.Vector: 
+ · ol.source.Image 对应的是一整张图，而不像瓦片那样很多张图，从而无需切片，也可以加载一些地图，适用于一些小场景地图。
+ · ol.source.Vector 对应的是矢量地图源，点，线，面等等常用的地图元素(Feature)，就囊括到这里面了。这样看来，只要这两种Source就可以搞定80%的需求了。
+ · ol.source.Tile 对应的是瓦片数据源，现在网页地图服务中，绝大多数都是使用的瓦片地图，而OpenLayers 3作为一个WebGIS引擎，理所当然应该支持瓦片。相对来说ol.source.Tile 较复杂，需要支持多种瓦片数据源（按照继承关系，从左向右展开的）：
+ ![avatar](http://anzhihun.coding.me/ol3-primer/img/ol.source.Tile.png)
+ 
+ > 先了解最为复杂的ol.source.Tile，其叶子节点类有很多，大致可以分为几类：（后面讲）
+ · 在线服务的Source，包括ol.source.BingMaps(使用的是微软提供的Bing在线地图数据)，ol.source.MapQuest(使用的是MapQuest提供的在线地图数据)(注: 由于MapQuest开始收费，ol v3.17.0就移除了ol.source.MapQuest)，ol.source.OSM(使用的是Open Street Map提供的在线地图数据)，ol.source.Stamen(使用的是Stamen提供的在线地图数据)。没有自己的地图服务器的情况下，可直接使用它们，加载地图底图。
+ · 支持协议标准的Source，包括ol.source.TileArcGISRest，ol.source.TileWMS，ol.source.WMTS，ol.source.UTFGrid，ol.source.TileJSON。如果要使用它们，首先你得先学习对应的协议，之后必须找到支持这些协议的服务器来提供数据源，这些服务器可以是地图服务提供商提供的，也可以是自己搭建的服务器，关键是得支持这些协议。
+ · ol.source.XYZ，这个需要单独提一下，因为是可以直接使用的，而且现在很多地图服务（在线的，或者自己搭建的服务器）都支持xyz方式的请求。国内在线的地图服务，高德，天地图等，都可以通过这种方式加载，本地离线瓦片地图也可以，用途广泛，且简单易学，需要掌握。
+
+ > ol.source.Image虽然有几种不同的子类，但大多比较简单，因为不牵涉到过多的协议和服务器提供商。
+ > 而ol.source.Vector就更加的简单了，但有时候其唯一的子类ol.source.Cluster在处理大量的Feature时，我们可能需要使用。 
+ 
+ > OpenLayers 3现有的Layer类图大致如下(图中标注了每一个Layer对应的Source)：
+ ![avatar](http://anzhihun.coding.me/ol3-primer/img/ol_layer_Base.png)
+ > 查看例子 ImageResolutionMap.html
+ · 新引入了ol.tilegrid.TileGrid，是定义瓦片网格，即瓦片坐标系。其作用在于设定每一地图层级的分辨率
+ > 解密在线地图瓦片url
+ · 瓦片的url解析对于想直接使用在线瓦片服务的开发者而言，根据难度，大致可以分为三种情况：
+  · 第一种是最简单的，请求瓦片的url明确有xyz参数，比如高德地图和百度地图。
+  · 第二种稍微难一点，xyz作为路径直接存在于url里面，没有明确的参数表明哪些是xyz，比如Open Street Map和Yahoo地图，这种情况下，地图服务器接收到请求后，就直接在服务器按照这个路径获取图片，按照这个逻辑，一般第一个参数表示是z，第二个参数为x，第三个参数为y。要想确认是否真是这样，可以写一个小程序来验证一下，如果还有问题，建议按照上面分析地图坐标系中的方法，从z比较小的情况入手来分析x，y，z的位置。
+  · 第三种则最难，地图服务提供商为了防止大家直接非法使用瓦片地图，对瓦片的url进行了加密，比如现在的微软Bing中文地图和Google地图，这种情况下只有知道如何解密才能使用。
+ > 加载url解密的微软Bing中文地图，查看例子 bing.html
+ · 需要注意的是地图数据是非常昂贵的，几乎所有的在线地图服务都提供了响应的服务接口，强烈建议在商用项目中使用这些接口。
+ > 加载离线瓦片地图（之前的例子都是离线地图）
+ > 解密在线地图瓦片url（参考例子bing.html）
+ > 静态地图及应用（参考例子bing.html）
  
  
- 它声明了一个特定的区域，svg区域横跨左上角的点(0,0)到点(400,300)。
- 区域被拉伸（类似缩放效果）来充满整个视窗。
- 用户坐标系被映射到视窗坐标系-在这种情况下-一个用户单位等于两个视窗单位。
-#### 类似于画图工具中的“放大镜”
-当viewBox和viewport的宽高比不相同时：
-```html
-<svg width="400" height="300" viewBox="0 0 100 150">
-    <!-- SVG content drawn onto the SVG canvas -->
-</svg>
-```
-因此图形在视窗中的定位默认为：
- · 整个viewBox适应视窗。
- · 保持viewBox的宽高比。viewBox没有被拉伸来覆盖视窗区域。
- · viewBox在视窗中水平垂直居中。
-这是默认表现。那用什么控制表现呢？如果我们想改变视窗中viewBox的位置呢？这就需要用到preserveAspectRatio属性了。
+ 
+ 
+ 
 
 ---
-###preserveAspectRatio
-#### preserveAspectRatio属性强制统一缩放比来保持图形的宽高比值。
-如果你用不同于视窗的宽高比定义用户坐标系，如果像我们在之前的例子中看到的那样浏览器拉伸viewBox来适应视窗，宽高比的不同会导致图形在某些方向上扭曲。
-> preserveAspectRatio = defer? <align> <meetOrSlice>?
-#####1、defer声明是可选的，并且只有当你在<image>上添加preserveAspectRatio才被用到。用在任何其他元素上时它都会被忽略；
-#####2、align参数声明是否强制统一放缩，如果是，对齐方法会在viewBox的宽高比不符合viewport的宽高比的情况下生效；
-#####如果align值设为none，图形不在保持宽高比而会缩放来适应视窗，像我们在上面两个例子中看到的那样。
-#####3、meetOrSlice也是可选的，默认值为meet。这个属性声明整个viewBox在视窗中是否可见。如果是，它和align参数通过一个或多个空格分隔：
-> meet(默认值)，基于以下两条准则尽可能缩放元素：
-  · 保持宽高比
-  · 整个viewBox在视窗中可见
-> slice 在保持宽高比的情况下，缩放图形直到viewBox覆盖了整个视窗区域
-#####viewBox被缩放到正好覆盖视窗区域（在两个维度上），但是它不会缩放任何超出这个范围的部分。换而言之，它缩放到viewBox的宽高可以正好完全覆盖视窗。在这种情况下，如果viewBox的宽高比不适合视窗，一部分viewBox会扩展超过视窗边界（即，viewBox绘制的区域会比视窗大）。这会导致部分viewBox被切片(类似于在画图工具中，放大一个图片)
-#####所以，meetOrSlice被用来声明viewBox是否会被完全包含在视窗中，或者它是否应该尽可能缩放来覆盖整个视窗，甚至意味着部分的viewBox会被“slice”
-
-#####可以把meetOrSlice的值类比于background-size的contain和cover值;它们非常类似。meet类似于contain，slice类似于cover。
-
----
-align参数使用9个值中的一个或者为none。任何除none之外的值都用来保持宽高比缩放图片，并且还用来在视窗中对齐viewBox。
-> #####none : 如果有必要的话viewBox被拉伸或缩放来完全适应整个视窗，不管宽高比。图形也许会扭曲;
+未完待续
